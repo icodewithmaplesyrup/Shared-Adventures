@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shared Adventures</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Courier+Prime:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #f5edd8;
+  --warm: #ede3cc;
+  --aged: #e2d6be;
+  --card: #faf4e8;
+  --ink: #1a1208;
+  --ink2: #5c5040;
+  --ink3: #9a8a70;
+  --rust: #aa3018;
+  --navy: #1e3060;
+  --sage: #3a6040;
+  --border: #c8b898;
+  --border2: #ddd0b8;
+  --noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+}
+
+body {
+  background: var(--warm);
+  color: var(--ink);
+  font-family: 'Courier Prime', monospace;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Paper grain overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: var(--noise);
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.7;
+}
+
+/* ── LAYOUT ── */
+.app-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  grid-template-rows: auto 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  grid-column: 1 / -1;
+  background: var(--cream);
+  border-bottom: 3px solid var(--ink);
+  position: relative;
+  padding: 0;
+}
+.masthead::before {
+  content: '';
+  display: block;
+  height: 6px;
+  background: repeating-linear-gradient(90deg,
+    var(--rust) 0, var(--rust) 20px,
+    var(--navy) 20px, var(--navy) 40px,
+    var(--ink) 40px, var(--ink) 60px
+  );
+}
+.masthead-inner {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--border);
+}
+.masthead-brand {
+  padding: 10px 20px 10px 16px;
+  border-right: 2px solid var(--ink);
+  flex-shrink: 0;
+}
+.brand-main {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--ink);
+  letter-spacing: -1px;
+}
+.brand-main em { color: var(--rust); font-style: normal; }
+.brand-sub {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--ink3);
+  margin-top: 3px;
+  display: block;
+}
+.masthead-nav {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-left: auto;
+}
+.htab {
+  padding: 0 18px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: var(--ink3);
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s;
+}
+.htab::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--rust);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.htab.active { color: var(--rust); }
+.htab.active::after { opacity: 1; }
+.htab:hover { color: var(--ink2); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--aged);
+  border-right: 2px solid var(--border);
+  overflow-y: auto;
+  padding: 16px 12px;
+  position: relative;
+}
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 4px;
+  background: repeating-linear-gradient(
+    180deg,
+    var(--rust) 0, var(--rust) 8px,
+    transparent 8px, transparent 16px
+  );
+  opacity: 0.4;
+}
+
+.sidebar-section { margin-bottom: 20px; }
+.sidebar-head {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--ink3);
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+  margin-bottom: 10px;
+  padding-left: 8px;
+}
+
+/* Postcard thumbs in sidebar */
+.pc-thumb {
+  display: flex;
+  gap: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+  position: relative;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-bottom: 3px solid var(--border);
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.12);
+  margin-bottom: -6px;
+  transition: transform 0.15s, z-index 0s;
+  z-index: 1;
+}
+.pc-thumb:nth-child(1) { transform: rotate(-1.2deg); z-index: 6; margin-left: 4px; }
+.pc-thumb:nth-child(2) { transform: rotate(0.8deg);  z-index: 5; margin-left: -2px; }
+.pc-thumb:nth-child(3) { transform: rotate(-0.5deg); z-index: 4; margin-left: 6px; }
+.pc-thumb:nth-child(4) { transform: rotate(1.3deg);  z-index: 3; margin-left: 0; }
+.pc-thumb:nth-child(5) { transform: rotate(-1deg);   z-index: 2; margin-left: 3px; }
+.pc-thumb:hover {
+  transform: rotate(0deg) translateY(-4px) !important;
+  z-index: 10 !important;
+  box-shadow: 3px 5px 0 rgba(0,0,0,0.2);
+}
+.pc-thumb:last-child { margin-bottom: 0; }
+.thumb-flag {
+  width: 28px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.thumb-postmark {
+  width: 28px; height: 28px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 7px;
+  color: var(--ink3);
+  text-align: center;
+  line-height: 1.1;
+  background: var(--cream);
+}
+.thumb-postmark.unread { border-color: var(--rust); color: var(--rust); }
+.thumb-info { flex: 1; min-width: 0; }
+.thumb-from {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thumb-preview {
+  font-size: 10px;
+  color: var(--ink3);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.thumb-when {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--ink3);
+  margin-top: 2px;
+}
+
+.compose-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 15px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+.compose-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--rust);
+}
+.compose-btn:hover { opacity: 0.85; }
+
+/* ── MAIN AREA ── */
+.main-area {
+  overflow-y: auto;
+  padding: 40px 20px 80px;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(0,0,0,0.04) 32px),
+    var(--warm);
+  position: relative;
+}
+
+.view { display: none; }
+.view.active { display: block; }
+
+#view-inbox {
+  position: relative;
+  padding-top: 16px;
+}
+
+/* ── FLIP CARD CONTAINER ── */
+.postcard-wrapper {
+  max-width: 580px;
+  position: relative;
+  margin-bottom: 24px;
+  perspective: 1200px;
+}
+.postcard-wrapper:nth-child(1) {
+  transform: rotate(-2.8deg);
+  z-index: 4;
+  margin-left: 24px;
+}
+.postcard-wrapper:nth-child(2) {
+  transform: rotate(1.9deg);
+  z-index: 3;
+  margin-left: -6px;
+  margin-right: 16px;
+  margin-top: 8px;
+}
+.postcard-wrapper:nth-child(3) {
+  transform: rotate(-1.1deg);
+  z-index: 2;
+  margin-left: 14px;
+  margin-top: 6px;
+}
+
+/* Tape piece on top */
+.postcard-tape {
+  position: absolute;
+  top: -10px; left: 50%;
+  transform: translateX(-50%) rotate(-1.5deg);
+  width: 70px; height: 16px;
+  background: rgba(170,48,24,0.25);
+  z-index: 10;
+  pointer-events: none;
+}
+.postcard-tape.alt {
+  left: 30%;
+  transform: translateX(-50%) rotate(1deg);
+  background: rgba(30,48,96,0.2);
+}
+
+/* The flipper — holds front and back */
+.postcard-flipper {
+  position: relative;
+  width: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+  cursor: pointer;
+  /* Tactile: slight shadow change on hover */
+}
+.postcard-wrapper.flipped .postcard-flipper {
+  transform: rotateY(180deg);
+}
+
+.postcard-front,
+.postcard-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 6px 8px 0 rgba(0,0,0,0.14), -1px 3px 0 rgba(0,0,0,0.07);
+  position: relative;
+}
+/* Inner border */
+.postcard-front::after,
+.postcard-back::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 0.5px solid var(--border2);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.postcard-back {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  transform: rotateY(180deg);
+  height: 100%;
+}
+
+/* ── FRONT: big photo + postmark header ── */
+.pc-front-photo {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  display: block;
+  filter: sepia(18%) contrast(1.05) brightness(0.95);
+  position: relative;
+  z-index: 1;
+}
+
+.pc-front-photo-placeholder {
+  width: 100%;
+  height: 260px;
+  background: linear-gradient(160deg, var(--aged) 0%, var(--border) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ink3);
+  font-style: italic;
+  font-size: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Vignette over photo */
+.pc-front-photo-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.pc-front-photo-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 60px rgba(26,18,8,0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Caption strip at bottom of photo */
+.pc-front-caption {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 20px 14px 10px;
+  background: linear-gradient(to top, rgba(26,18,8,0.7) 0%, transparent 100%);
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.pc-front-city {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 18px;
+  color: var(--cream);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.pc-front-stamps {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+.pc-front-stamp {
+  width: 38px; height: 48px;
+  border: 1.5px solid rgba(200,184,152,0.6);
+  background: rgba(250,244,232,0.15);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: rgba(245,237,216,0.9);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+  text-align: center;
+}
+.pc-front-stamp .stamp-emoji { font-size: 14px; display: block; }
+.pc-front-postmark {
+  width: 44px; height: 44px;
+  border: 1.5px solid rgba(200,184,152,0.5);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 6.5px;
+  letter-spacing: 1px;
+  color: rgba(245,237,216,0.85);
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* Flip hint label */
+.pc-flip-hint {
+  background: var(--cream);
+  border-top: 1px solid var(--border2);
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ink3);
+  position: relative;
+  z-index: 1;
+}
+.pc-flip-hint::before {
+  content: '↻';
+  font-size: 14px;
+  color: var(--rust);
+  opacity: 0.7;
+}
+.postcard-wrapper.flipped .pc-flip-hint { opacity: 0; }
+
+/* ── BACK: traditional postcard layout ── */
+.pc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border2);
+  position: relative;
+  z-index: 1;
+}
+.pc-from-block { flex: 1; }
+.pc-from-name {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.2;
+  margin-bottom: 2px;
+}
+.pc-from-city {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--ink3);
+}
+.pc-matched {
+  font-size: 10px;
+  color: var(--ink3);
+  font-style: italic;
+  margin-top: 3px;
+}
+.pc-stamps {
+  display: flex;
+  gap: 4px;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+.pc-stamp-box {
+  width: 40px; height: 50px;
+  border: 1px solid var(--border);
+  background: var(--warm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--ink3);
+  text-align: center;
+  line-height: 1.3;
+  padding: 2px;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+}
+.pc-stamp-box .stamp-emoji { font-size: 16px; display: block; }
+.pc-postmark-circle {
+  width: 48px; height: 48px;
+  border: 1.5px solid var(--border);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  color: var(--ink3);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.pc-body {
+  display: grid;
+  grid-template-columns: 1fr 1px 160px;
+  min-height: 130px;
+  border-top: 1px solid var(--border2);
+  position: relative;
+  z-index: 1;
+}
+.pc-message-col { padding: 14px 14px; }
+.pc-message {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--ink);
+}
+.pc-divider-col { background: var(--border2); }
+.pc-address-col {
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: space-between;
+}
+.pc-lines { display: flex; flex-direction: column; gap: 10px; }
+.pc-line { height: 1px; background: var(--border); }
+.pc-to {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--ink3);
+  line-height: 1.6;
+  margin-top: auto;
+}
+.pc-to strong { color: var(--rust); display: block; font-size: 12px; }
+
+.pc-foot {
+  border-top: 1px solid var(--border2);
+  padding: 10px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: rgba(0,0,0,0.02);
+  position: relative;
+  z-index: 1;
+}
+.pc-action-btn {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pc-action-btn:hover { border-color: var(--rust); color: var(--rust); }
+.pc-action-btn.reply-btn { background: var(--rust); border-color: var(--rust); color: var(--cream); }
+.pc-action-btn.reply-btn:hover { opacity: 0.85; }
+.pc-when {
+  margin-left: auto;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--ink3);
+}
+
+/* Back of card: flip back label */
+.pc-flip-back-hint {
+  background: rgba(0,0,0,0.02);
+  border-top: 1px dashed var(--border2);
+  padding: 7px 14px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ink3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+.pc-flip-back-hint::before { content: '↩'; font-size: 12px; color: var(--ink3); }
+
+/* ── COMPOSE VIEW ── */
+.compose-sheet {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 4px 5px 0 var(--border);
+  position: relative;
+  transform: rotate(-0.3deg);
+}
+.compose-sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 28px,
+    var(--border2) 28px,
+    var(--border2) 29px
+  );
+  pointer-events: none;
+  opacity: 0.5;
+}
+.compose-sheet::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 40px;
+  width: 1px;
+  background: rgba(170,48,24,0.3);
+  pointer-events: none;
+}
+.compose-inner { padding: 20px 20px 20px 52px; position: relative; z-index: 1; }
+.compose-heading {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.compose-sub {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-bottom: 18px;
+  line-height: 1.6;
+  font-style: italic;
+}
+.reply-to-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: var(--warm);
+  border: 1px dashed var(--border);
+  font-size: 10px;
+  color: var(--ink2);
+  font-style: italic;
+  margin-bottom: 14px;
+  font-family: 'Courier Prime', monospace;
+}
+.compose-field { margin-bottom: 16px; }
+.compose-field label {
+  display: block;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--ink3);
+  margin-bottom: 5px;
+}
+.compose-field textarea, .compose-field input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--border);
+  padding: 4px 0;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+  resize: none;
+  line-height: 1.8;
+  transition: border-color 0.15s;
+}
+.compose-field textarea:focus, .compose-field input:focus { border-bottom-color: var(--rust); }
+.compose-note {
+  font-size: 10px;
+  color: var(--ink3);
+  font-style: italic;
+  padding-top: 10px;
+  border-top: 1px solid var(--border2);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.send-row { display: flex; gap: 12px; align-items: center; margin-top: 16px; }
+.send-btn {
+  padding: 11px 24px;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.send-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--rust);
+}
+.send-btn:hover { opacity: 0.85; }
+.send-note { font-size: 11px; color: var(--ink3); font-style: italic; }
+
+/* ── ROUTE VIEW ── */
+.route-header {
+  max-width: 600px;
+  margin: 0 auto 20px;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--ink3);
+}
+.route-strip {
+  max-width: 600px;
+  margin: 0 auto 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 3px 4px 0 var(--border);
+  display: flex;
+  overflow: hidden;
+  transform: rotate(0.2deg);
+}
+.route-node {
+  flex: 1;
+  padding: 14px 10px;
+  text-align: center;
+  border-right: 1px solid var(--border2);
+  position: relative;
+}
+.route-node:last-child { border-right: none; }
+.route-node.visited { background: rgba(170,48,24,0.04); }
+.rn-city {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.rn-status {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--ink3);
+}
+.rn-arrow {
+  position: absolute;
+  right: -8px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: var(--border);
+  z-index: 1;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+/* ── ROUTE: traditional-style postcard (no flip) ── */
+.postcard {
+  max-width: 580px;
+  position: relative;
+  margin-bottom: 0;
+}
+.postcard-inner {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 6px 8px 0 rgba(0,0,0,0.14), -1px 3px 0 rgba(0,0,0,0.07);
+  position: relative;
+}
+.postcard-inner::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 0.5px solid var(--border2);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── ONBOARDING ── */
+.onboarding-sheet {
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 5px 6px 0 var(--border);
+  padding: 32px 28px;
+  position: relative;
+  transform: rotate(-0.4deg);
+}
+.onboarding-sheet::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 32px; height: 32px;
+  background: linear-gradient(225deg, var(--warm) 50%, var(--card) 50%);
+  border-left: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ob-eyebrow {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--rust);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ob-eyebrow::before, .ob-eyebrow::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, var(--rust) 0, var(--rust) 3px, transparent 3px, transparent 6px);
+}
+.ob-q {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+.ob-textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--border);
+  padding: 8px 0;
+  font-family: 'Permanent Marker', cursive;
+  font-size: 14px;
+  color: var(--ink);
+  min-height: 100px;
+  outline: none;
+  resize: none;
+  line-height: 1.8;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 32px,
+    var(--border2) 32px,
+    var(--border2) 33px
+  );
+  background-attachment: local;
+}
+.ob-textarea:focus { border-bottom-color: var(--rust); }
+.ob-note {
+  font-size: 11px;
+  color: var(--ink3);
+  font-style: italic;
+  margin-top: 12px;
+  line-height: 1.7;
+  border-left: 2px solid var(--border);
+  padding-left: 10px;
+}
+.ob-btn {
+  margin-top: 20px;
+  padding: 12px 28px;
+  background: var(--ink);
+  color: var(--cream);
+  border: none;
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);
+}
+.ob-btn:hover { opacity: 0.85; }
+
+/* Hover lift effect on flip cards */
+.postcard-wrapper:hover .postcard-flipper {
+  box-shadow: 8px 14px 30px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- MASTHEAD -->
+  <header class="masthead">
+    <div class="masthead-inner">
+      <div class="masthead-brand">
+        <div class="brand-main">Shared <em>Adventures</em></div>
+        <span class="brand-sub">A Postcard Exchange for People Who Go Outside</span>
+      </div>
+      <div class="masthead-nav">
+        <button class="htab active" onclick="switchView('inbox')">INBOX</button>
+        <button class="htab" onclick="switchView('compose')">WRITE</button>
+        <button class="htab" onclick="switchView('route')">YOUR ROUTE</button>
+        <button class="htab" onclick="switchView('onboarding')">YOUR DOOR</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-head">RECEIVED</div>
+
+      <div class="pc-thumb" onclick="switchView('inbox')">
+        <div class="thumb-flag">
+          <div class="thumb-postmark unread">NEW</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-from">Osaka, Japan</div>
+          <div class="thumb-preview">"took the wrong exit from..."</div>
+          <div class="thumb-when">2 DAYS AGO</div>
+        </div>
+      </div>
+
+      <div class="pc-thumb" onclick="switchView('inbox')">
+        <div class="thumb-flag">
+          <div class="thumb-postmark">RD</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-from">Porto, Portugal</div>
+          <div class="thumb-preview">"my first time doing..."</div>
+          <div class="thumb-when">LAST WEEK</div>
+        </div>
+      </div>
+
+      <div class="pc-thumb" onclick="switchView('inbox')">
+        <div class="thumb-flag">
+          <div class="thumb-postmark">RD</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-from">Toronto, Canada</div>
+          <div class="thumb-preview">"there's a tunnel under..."</div>
+          <div class="thumb-when">2 WEEKS AGO</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-head">SENT</div>
+
+      <div class="pc-thumb">
+        <div class="thumb-flag">
+          <div class="thumb-postmark" style="border-color:var(--sage);color:var(--sage);">→</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-from">to Seoul, Korea</div>
+          <div class="thumb-preview">the backstreet boys incident</div>
+          <div class="thumb-when">4 DAYS AGO</div>
+        </div>
+      </div>
+
+      <div class="pc-thumb">
+        <div class="thumb-flag">
+          <div class="thumb-postmark" style="border-color:var(--sage);color:var(--sage);">→</div>
+        </div>
+        <div class="thumb-info">
+          <div class="thumb-from">to Lisbon, Portugal</div>
+          <div class="thumb-preview">in-n-out, but the journey</div>
+          <div class="thumb-when">3 WEEKS AGO</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="compose-btn" onclick="switchView('compose')">Write a Postcard →</button>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+
+    <!-- INBOX -->
+    <div class="view active" id="view-inbox">
+
+      <!-- Postcard 1: Osaka — flippable -->
+      <div class="postcard-wrapper" id="card-1">
+        <div class="postcard-tape"></div>
+        <div class="postcard-flipper" onclick="flipCard('card-1')">
+
+          <!-- FRONT: Photo side -->
+          <div class="postcard-front">
+            <div class="pc-front-photo-wrap" style="position:relative;">
+              <img
+                class="pc-front-photo"
+                src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80"
+                alt="Osaka covered market"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+              >
+              <div class="pc-front-photo-placeholder" style="display:none;">
+                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
+                <span>Osaka, Japan · shared by sender</span>
+              </div>
+              <div class="pc-front-caption">
+                <div class="pc-front-city">Osaka, Japan</div>
+                <div class="pc-front-stamps">
+                  <div class="pc-front-stamp">
+                    <span class="stamp-emoji">🗾</span>
+                    <span>Osaka</span>
+                  </div>
+                  <div class="pc-front-postmark">SHARED<br>ADVS<br>APR 26</div>
+                </div>
+              </div>
+            </div>
+            <div class="pc-flip-hint">TAP TO READ</div>
+          </div>
+
+          <!-- BACK: Message side -->
+          <div class="postcard-back">
+            <div class="pc-head">
+              <div class="pc-from-block">
+                <div class="pc-from-name">Unknown Sender</div>
+                <div class="pc-from-city">Osaka, Japan</div>
+                <div class="pc-matched">matched by: going somewhere alone</div>
+              </div>
+              <div class="pc-stamps">
+                <div class="pc-stamp-box">
+                  <span class="stamp-emoji">🗾</span>
+                  <span>Osaka</span>
+                </div>
+                <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
+              </div>
+            </div>
+
+            <div class="pc-body">
+              <div class="pc-message-col">
+                <div class="pc-message">I took the wrong exit from the subway and ended up in a covered market that had been there since 1952. An old woman was selling just one thing — tamagoyaki. I sat on a plastic stool for an hour and didn't feel alone at all.</div>
+              </div>
+              <div class="pc-divider-col"></div>
+              <div class="pc-address-col">
+                <div class="pc-lines">
+                  <div class="pc-line"></div>
+                  <div class="pc-line"></div>
+                  <div class="pc-line"></div>
+                </div>
+                <div class="pc-to">
+                  For someone who goes outside alone<br>
+                  <strong>→ you</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="pc-foot">
+              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
+              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
+              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
+              <span class="pc-when">2 DAYS AGO</span>
+            </div>
+            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-1')">Flip to photo</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Postcard 2: Porto — flippable -->
+      <div class="postcard-wrapper" id="card-2">
+        <div class="postcard-tape alt"></div>
+        <div class="postcard-flipper" onclick="flipCard('card-2')">
+
+          <!-- FRONT -->
+          <div class="postcard-front">
+            <div class="pc-front-photo-wrap" style="position:relative;">
+              <img
+                class="pc-front-photo"
+                src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80"
+                alt="Porto Portugal street"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+              >
+              <div class="pc-front-photo-placeholder" style="display:none;">
+                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
+                <span>Porto, Portugal · shared by sender</span>
+              </div>
+              <div class="pc-front-caption">
+                <div class="pc-front-city">Porto, Portugal</div>
+                <div class="pc-front-stamps">
+                  <div class="pc-front-stamp">
+                    <span class="stamp-emoji">🇵🇹</span>
+                    <span>Porto</span>
+                  </div>
+                  <div class="pc-front-postmark">SHARED<br>ADVS<br>MAR 26</div>
+                </div>
+              </div>
+            </div>
+            <div class="pc-flip-hint">TAP TO READ</div>
+          </div>
+
+          <!-- BACK -->
+          <div class="postcard-back">
+            <div class="pc-head">
+              <div class="pc-from-block">
+                <div class="pc-from-name">Unknown Sender</div>
+                <div class="pc-from-city">Porto, Portugal</div>
+                <div class="pc-matched">matched by: first time going somewhere unfamiliar</div>
+              </div>
+              <div class="pc-stamps">
+                <div class="pc-stamp-box">
+                  <span class="stamp-emoji">🇵🇹</span>
+                  <span>Porto</span>
+                </div>
+                <div class="pc-postmark-circle">SHARED<br>ADVS<br>MAR 26</div>
+              </div>
+            </div>
+
+            <div class="pc-body">
+              <div class="pc-message-col">
+                <div class="pc-message">My first time doing something like this. I went to the neighborhood my grandfather grew up in — I'd driven past it my whole life. There's a café that's been there since before he was born. I understood something about him for the first time.</div>
+              </div>
+              <div class="pc-divider-col"></div>
+              <div class="pc-address-col">
+                <div class="pc-lines">
+                  <div class="pc-line"></div>
+                  <div class="pc-line"></div>
+                  <div class="pc-line"></div>
+                </div>
+                <div class="pc-to">
+                  For a first-timer<br>
+                  <strong>→ you</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="pc-foot">
+              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
+              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
+              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
+              <span class="pc-when">LAST WEEK</span>
+            </div>
+            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-2')">Flip to photo</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Postcard 3: Seoul (sent back to you) — flippable -->
+      <div class="postcard-wrapper" id="card-3">
+        <div class="postcard-tape" style="background:rgba(58,96,64,0.2)"></div>
+        <div class="postcard-flipper" onclick="flipCard('card-3')">
+
+          <!-- FRONT -->
+          <div class="postcard-front">
+            <div class="pc-front-photo-wrap" style="position:relative;">
+              <img
+                class="pc-front-photo"
+                src="https://images.unsplash.com/photo-1540914124281-342587941389?w=800&q=80"
+                alt="Seoul Korea street night"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+              >
+              <div class="pc-front-photo-placeholder" style="display:none;">
+                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
+                <span>Seoul, South Korea · from a stranger</span>
+              </div>
+              <div class="pc-front-caption">
+                <div class="pc-front-city">Seoul, South Korea</div>
+                <div class="pc-front-stamps">
+                  <div class="pc-front-stamp">
+                    <span class="stamp-emoji">🇰🇷</span>
+                    <span>Seoul</span>
+                  </div>
+                  <div class="pc-front-postmark">SHARED<br>ADVS<br>APR 26</div>
+                </div>
+              </div>
+            </div>
+            <div class="pc-flip-hint">TAP TO READ REPLY</div>
+          </div>
+
+          <!-- BACK -->
+          <div class="postcard-back">
+            <div class="pc-head">
+              <div class="pc-from-block">
+                <div class="pc-from-name">Unknown Sender</div>
+                <div class="pc-from-city">Seoul, South Korea</div>
+                <div class="pc-matched">replying to: your suits story</div>
+              </div>
+              <div class="pc-stamps">
+                <div class="pc-stamp-box">
+                  <span class="stamp-emoji">🇰🇷</span>
+                  <span>Seoul</span>
+                </div>
+                <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
+              </div>
+            </div>
+
+            <div class="pc-body">
+              <div class="pc-message-col">
+                <div class="pc-message">We did something similar last winter. Formal clothes to a street market. The vendor gave us extra dumplings because she thought it was funny. Your story made me want to do it again.</div>
+              </div>
+              <div class="pc-divider-col"></div>
+              <div class="pc-address-col">
+                <div class="pc-lines">
+                  <div class="pc-line"></div>
+                  <div class="pc-line"></div>
+                  <div class="pc-line"></div>
+                </div>
+                <div class="pc-to">
+                  In reply to your adventure<br>
+                  <strong>→ you, in LA</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="pc-foot">
+              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
+              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
+              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
+              <span class="pc-when">1 DAY AGO</span>
+            </div>
+            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-3')">Flip to photo</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COMPOSE -->
+    <div class="view" id="view-compose">
+      <div class="compose-sheet">
+        <div class="compose-inner">
+          <div class="compose-heading">Write a postcard</div>
+          <div class="compose-sub">One moment. One image if you have one. A few lines or just one — it doesn't matter. It goes to someone who needs it.</div>
+          <div class="reply-to-tag">✦ Replying to: the Osaka market story</div>
+          <div class="compose-field">
+            <label>Your moment</label>
+            <textarea rows="5" placeholder="tell them what happened. what you found. what it felt like."></textarea>
+          </div>
+          <div class="compose-field">
+            <label>One image (optional)</label>
+            <input type="text" placeholder="paste a photo url or tap to upload →">
+          </div>
+          <div class="compose-field">
+            <label>Where you are (city only)</label>
+            <input type="text" placeholder="East Los Angeles, CA">
+          </div>
+          <div class="compose-note">Your name is never shared. Your city appears on the postmark. Your postcard goes to someone matched by the theme of your story — not by algorithm.</div>
+          <div class="send-row">
+            <button class="send-btn" onclick="sendPostcard()">Send it →</button>
+            <span class="send-note">Goes to one person. Just one.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROUTE -->
+    <div class="view" id="view-route">
+      <div class="route-header">Your postcard's journey so far —</div>
+      <div class="route-strip">
+        <div class="route-node visited">
+          <div class="rn-city">LA</div>
+          <div class="rn-status">YOU · SENT</div>
+          <div class="rn-arrow">→</div>
+        </div>
+        <div class="route-node visited">
+          <div class="rn-city">Seoul</div>
+          <div class="rn-status">READ · REPLIED</div>
+          <div class="rn-arrow">→</div>
+        </div>
+        <div class="route-node">
+          <div class="rn-city">?</div>
+          <div class="rn-status">PASSED ALONG</div>
+          <div class="rn-arrow">→</div>
+        </div>
+        <div class="route-node">
+          <div class="rn-city">?</div>
+          <div class="rn-status">?</div>
+        </div>
+      </div>
+
+      <div class="postcard">
+        <div class="postcard-inner">
+          <div class="pc-head">
+            <div class="pc-from-block">
+              <div class="pc-from-name">Your postcard</div>
+              <div class="pc-from-city">Sent to Seoul, South Korea</div>
+              <div class="pc-matched">about: suits & a street guitarist</div>
+            </div>
+            <div class="pc-stamps">
+              <div class="pc-stamp-box">
+                <span class="stamp-emoji">🌆</span>
+                <span>LA</span>
+              </div>
+              <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
+            </div>
+          </div>
+          <div class="pc-body">
+            <div class="pc-message-col">
+              <div class="pc-message">We put on suits for no reason and took the metro downtown. Found a guitarist outside a bar who knew every Backstreet Boys song. We stayed for two hours. The suits were the whole reason it happened.</div>
+            </div>
+            <div class="pc-divider-col"></div>
+            <div class="pc-address-col">
+              <div class="pc-lines">
+                <div class="pc-line"></div>
+                <div class="pc-line"></div>
+                <div class="pc-line"></div>
+              </div>
+              <div class="pc-to">
+                For anyone afraid to just go<br>
+                <strong>→ Seoul, Korea</strong>
+              </div>
+            </div>
+          </div>
+          <div class="pc-foot">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--sage);">✓ RECEIVED · REPLY CAME BACK</span>
+            <span class="pc-when">4 DAYS AGO</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ONBOARDING -->
+    <div class="view" id="view-onboarding">
+      <div class="onboarding-sheet">
+        <div class="ob-eyebrow">Before you get any postcards</div>
+        <div class="ob-q">"What's the last time something unexpected happened to you outside, and it became a story you still tell?"</div>
+        <textarea class="ob-textarea" placeholder="take your time. even something small. the metro trip that turned into something. the wrong turn that became the right one. the night that wasn't supposed to be a night."></textarea>
+        <div class="ob-note">This becomes the seed of your first postcard, and how we match you to the right strangers. Nothing is public. Only the story you choose to send will ever leave your phone.</div>
+        <button class="ob-btn" onclick="finishOnboarding()">That's my door →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ── VIEW SWITCHING ── */
+function switchView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  document.querySelectorAll('.htab').forEach((t, i) => {
+    t.classList.toggle('active', ['inbox','compose','route','onboarding'][i] === name);
+  });
+}
+
+/* ── CARD FLIP ── */
+function flipCard(id) {
+  const wrapper = document.getElementById(id);
+  const isFlipping = wrapper.classList.toggle('flipped');
+
+  // Haptic feedback on flip
+  triggerHaptic(isFlipping ? 'medium' : 'light');
+}
+
+/* ── HAPTIC ENGINE ── */
+function triggerHaptic(style) {
+  // Vibration API (Android, some browsers)
+  if ('vibrate' in navigator) {
+    const patterns = {
+      light:  [10],
+      medium: [20],
+      heavy:  [15, 10, 15],
+      tap:    [8]
+    };
+    navigator.vibrate(patterns[style] || [10]);
+  }
+}
+
+function hapticTap() {
+  triggerHaptic('tap');
+}
+
+/* ── SEND POSTCARD ── */
+function sendPostcard() {
+  triggerHaptic('heavy');
+  alert('Postcard sent.\n\nIt will arrive with one stranger, matched by the theme of your story.\n\nYou\'ll hear back eventually.');
+  switchView('route');
+}
+
+/* ── ONBOARDING ── */
+function finishOnboarding() {
+  const txt = document.querySelector('.ob-textarea').value;
+  if (!txt.trim()) { alert('Write something first — even one sentence.'); return; }
+  triggerHaptic('medium');
+  switchView('compose');
+}
+
+/* ── TOUCH HAPTICS on interactive elements ── */
+document.querySelectorAll('.pc-action-btn, .pc-thumb, .compose-btn, .htab').forEach(el => {
+  el.addEventListener('touchstart', () => triggerHaptic('tap'), { passive: true });
+});
+</script>
+</body>
+</html>

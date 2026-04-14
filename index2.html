@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidequest // Vector Lab</title>
+    <style>
+        :root { --ink: #1a1208; --paper: #f5edd8; --accent: #aa3018; }
+        body { background: var(--paper); color: var(--ink); font-family: 'Courier New', Courier, monospace; padding: 2rem; max-width: 800px; margin: auto; }
+        .box { border: 2px solid var(--ink); padding: 1.5rem; margin-bottom: 2rem; background: rgba(255,255,255,0.3); }
+        textarea { width: 100%; height: 80px; background: transparent; border: 1px solid #ccc; padding: 10px; font-family: inherit; }
+        button { background: var(--ink); color: var(--paper); border: none; padding: 10px 20px; cursor: pointer; margin-top: 10px; }
+        button:disabled { opacity: 0.5; }
+        .result { font-size: 0.9rem; word-break: break-all; margin-top: 10px; color: var(--accent); }
+        h2 { border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Sidequest Vector Lab</h1>
+    <p id="status">Status: Loading model (25MB)...</p>
+
+    <div class="box">
+        <h2>1. Generate Embedding</h2>
+        <textarea id="input1" placeholder="Type a Lore entry here... (e.g., 'Found a neon sign in a rainy alley')"></textarea>
+        <button id="btn1" disabled>Vectorize</button>
+        <div id="output1" class="result"></div>
+    </div>
+
+    <div class="box">
+        <h2>2. Compare Similarity</h2>
+        <textarea id="input2" placeholder="Type another entry to compare..."></textarea>
+        <button id="btnCompare" disabled>Calculate Similarity</button>
+        <div id="similarityScore" style="font-size: 2rem; font-weight: bold; margin-top: 10px;">--</div>
+        <p><i>(1.00 is identical, 0.00 is completely different)</i></p>
+    </div>
+
+    <script type="module">
+        // Using the CDN for Transformers.js
+        import { pipeline, dot } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0';
+
+        let pipe;
+        let vector1 = null;
+        const status = document.getElementById('status');
+
+        // Initialize the pipeline
+        async function init() {
+            pipe = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+            status.textContent = "Status: Ready. Model loaded.";
+            document.getElementById('btn1').disabled = false;
+            document.getElementById('btnCompare').disabled = false;
+        }
+        init();
+
+        // Helper: Get Vector from text
+        async function getVector(text) {
+            const output = await pipe(text, { pooling: 'mean', normalize: true });
+            return Array.from(output.data);
+        }
+
+        // Logic for Button 1
+        document.getElementById('btn1').onclick = async () => {
+            const text = document.getElementById('input1').value;
+            status.textContent = "Vectorizing...";
+            vector1 = await getVector(text);
+            document.getElementById('output1').textContent = `Vector (First 10 dims): [${vector1.slice(0, 10).join(', ')}...]`;
+            status.textContent = "Status: Ready.";
+        };
+
+        // Logic for Comparison
+        document.getElementById('btnCompare').onclick = async () => {
+            const text2 = document.getElementById('input2').value;
+            if (!vector1) { alert("Vectorize the first box first!"); return; }
+            
+            status.textContent = "Comparing...";
+            const vector2 = await getVector(text2);
+            
+            // Since we normalized the vectors, dot product = cosine similarity
+            const score = dot(vector1, vector2);
+            document.getElementById('similarityScore').textContent = score.toFixed(4);
+            status.textContent = "Status: Ready.";
+        };
+    </script>
+</body>
+</html>
