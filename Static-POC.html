@@ -1011,244 +1011,14 @@ body::before {
 
     <!-- INBOX -->
     <div class="view active" id="view-inbox">
-
-      <!-- Postcard 1: Osaka — flippable -->
-      <div class="postcard-wrapper" id="card-1">
-        <div class="postcard-tape"></div>
-        <div class="postcard-flipper" onclick="flipCard('card-1')">
-
-          <!-- FRONT: Photo side -->
-          <div class="postcard-front">
-            <div class="pc-front-photo-wrap" style="position:relative;">
-              <img
-                class="pc-front-photo"
-                src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80"
-                alt="Osaka covered market"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              >
-              <div class="pc-front-photo-placeholder" style="display:none;">
-                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
-                <span>Osaka, Japan · shared by sender</span>
-              </div>
-              <div class="pc-front-caption">
-                <div class="pc-front-city">Osaka, Japan</div>
-                <div class="pc-front-stamps">
-                  <div class="pc-front-stamp">
-                    <span class="stamp-emoji">🗾</span>
-                    <span>Osaka</span>
-                  </div>
-                  <div class="pc-front-postmark">SHARED<br>ADVS<br>APR 26</div>
-                </div>
-              </div>
-            </div>
-            <div class="pc-flip-hint">TAP TO READ</div>
+      <div id="inbox-empty" class="postcard" style="display:none; margin:18px;">
+        <div class="postcard-inner">
+          <div class="pc-message" style="padding:18px;">
+            No real postcards yet. Once another user sends to your door, it will appear here.
           </div>
-
-          <!-- BACK: Message side -->
-          <div class="postcard-back">
-            <div class="pc-head">
-              <div class="pc-from-block">
-                <div class="pc-from-name">Unknown Sender</div>
-                <div class="pc-from-city">Osaka, Japan</div>
-                <div class="pc-matched">matched by: going somewhere alone</div>
-              </div>
-              <div class="pc-stamps">
-                <div class="pc-stamp-box">
-                  <span class="stamp-emoji">🗾</span>
-                  <span>Osaka</span>
-                </div>
-                <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
-              </div>
-            </div>
-
-            <div class="pc-body">
-              <div class="pc-message-col">
-                <div class="pc-message">I took the wrong exit from the subway and ended up in a covered market that had been there since 1952. An old woman was selling just one thing — tamagoyaki. I sat on a plastic stool for an hour and didn't feel alone at all.</div>
-              </div>
-              <div class="pc-divider-col"></div>
-              <div class="pc-address-col">
-                <div class="pc-lines">
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                </div>
-                <div class="pc-to">
-                  For someone who goes outside alone<br>
-                  <strong>→ you</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pc-foot">
-              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
-              <span class="pc-when">2 DAYS AGO</span>
-            </div>
-            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-1')">Flip to photo</div>
-          </div>
-
         </div>
       </div>
-
-      <!-- Postcard 2: Porto — flippable -->
-      <div class="postcard-wrapper" id="card-2">
-        <div class="postcard-tape alt"></div>
-        <div class="postcard-flipper" onclick="flipCard('card-2')">
-
-          <!-- FRONT -->
-          <div class="postcard-front">
-            <div class="pc-front-photo-wrap" style="position:relative;">
-              <img
-                class="pc-front-photo"
-                src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80"
-                alt="Porto Portugal street"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              >
-              <div class="pc-front-photo-placeholder" style="display:none;">
-                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
-                <span>Porto, Portugal · shared by sender</span>
-              </div>
-              <div class="pc-front-caption">
-                <div class="pc-front-city">Porto, Portugal</div>
-                <div class="pc-front-stamps">
-                  <div class="pc-front-stamp">
-                    <span class="stamp-emoji">🇵🇹</span>
-                    <span>Porto</span>
-                  </div>
-                  <div class="pc-front-postmark">SHARED<br>ADVS<br>MAR 26</div>
-                </div>
-              </div>
-            </div>
-            <div class="pc-flip-hint">TAP TO READ</div>
-          </div>
-
-          <!-- BACK -->
-          <div class="postcard-back">
-            <div class="pc-head">
-              <div class="pc-from-block">
-                <div class="pc-from-name">Unknown Sender</div>
-                <div class="pc-from-city">Porto, Portugal</div>
-                <div class="pc-matched">matched by: first time going somewhere unfamiliar</div>
-              </div>
-              <div class="pc-stamps">
-                <div class="pc-stamp-box">
-                  <span class="stamp-emoji">🇵🇹</span>
-                  <span>Porto</span>
-                </div>
-                <div class="pc-postmark-circle">SHARED<br>ADVS<br>MAR 26</div>
-              </div>
-            </div>
-
-            <div class="pc-body">
-              <div class="pc-message-col">
-                <div class="pc-message">My first time doing something like this. I went to the neighborhood my grandfather grew up in — I'd driven past it my whole life. There's a café that's been there since before he was born. I understood something about him for the first time.</div>
-              </div>
-              <div class="pc-divider-col"></div>
-              <div class="pc-address-col">
-                <div class="pc-lines">
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                </div>
-                <div class="pc-to">
-                  For a first-timer<br>
-                  <strong>→ you</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pc-foot">
-              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
-              <span class="pc-when">LAST WEEK</span>
-            </div>
-            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-2')">Flip to photo</div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Postcard 3: Seoul (sent back to you) — flippable -->
-      <div class="postcard-wrapper" id="card-3">
-        <div class="postcard-tape" style="background:rgba(58,96,64,0.2)"></div>
-        <div class="postcard-flipper" onclick="flipCard('card-3')">
-
-          <!-- FRONT -->
-          <div class="postcard-front">
-            <div class="pc-front-photo-wrap" style="position:relative;">
-              <img
-                class="pc-front-photo"
-                src="https://images.unsplash.com/photo-1540914124281-342587941389?w=800&q=80"
-                alt="Seoul Korea street night"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              >
-              <div class="pc-front-photo-placeholder" style="display:none;">
-                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
-                <span>Seoul, South Korea · from a stranger</span>
-              </div>
-              <div class="pc-front-caption">
-                <div class="pc-front-city">Seoul, South Korea</div>
-                <div class="pc-front-stamps">
-                  <div class="pc-front-stamp">
-                    <span class="stamp-emoji">🇰🇷</span>
-                    <span>Seoul</span>
-                  </div>
-                  <div class="pc-front-postmark">SHARED<br>ADVS<br>APR 26</div>
-                </div>
-              </div>
-            </div>
-            <div class="pc-flip-hint">TAP TO READ REPLY</div>
-          </div>
-
-          <!-- BACK -->
-          <div class="postcard-back">
-            <div class="pc-head">
-              <div class="pc-from-block">
-                <div class="pc-from-name">Unknown Sender</div>
-                <div class="pc-from-city">Seoul, South Korea</div>
-                <div class="pc-matched">replying to: your suits story</div>
-              </div>
-              <div class="pc-stamps">
-                <div class="pc-stamp-box">
-                  <span class="stamp-emoji">🇰🇷</span>
-                  <span>Seoul</span>
-                </div>
-                <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
-              </div>
-            </div>
-
-            <div class="pc-body">
-              <div class="pc-message-col">
-                <div class="pc-message">We did something similar last winter. Formal clothes to a street market. The vendor gave us extra dumplings because she thought it was funny. Your story made me want to do it again.</div>
-              </div>
-              <div class="pc-divider-col"></div>
-              <div class="pc-address-col">
-                <div class="pc-lines">
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                </div>
-                <div class="pc-to">
-                  In reply to your adventure<br>
-                  <strong>→ you, in LA</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pc-foot">
-              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
-              <span class="pc-when">1 DAY AGO</span>
-            </div>
-            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-3')">Flip to photo</div>
-          </div>
-
-        </div>
-      </div>
-
+      <div id="inbox-list"></div>
     </div>
 
     <!-- COMPOSE -->
@@ -1282,47 +1052,27 @@ body::before {
     <!-- ROUTE -->
     <div class="view" id="view-route">
       <div class="route-header">Your postcard's journey so far —</div>
-      <div class="route-strip">
-        <div class="route-node visited">
-          <div class="rn-city">LA</div>
-          <div class="rn-status">YOU · SENT</div>
-          <div class="rn-arrow">→</div>
-        </div>
-        <div class="route-node visited">
-          <div class="rn-city">Seoul</div>
-          <div class="rn-status">READ · REPLIED</div>
-          <div class="rn-arrow">→</div>
-        </div>
-        <div class="route-node">
-          <div class="rn-city">?</div>
-          <div class="rn-status">PASSED ALONG</div>
-          <div class="rn-arrow">→</div>
-        </div>
-        <div class="route-node">
-          <div class="rn-city">?</div>
-          <div class="rn-status">?</div>
-        </div>
-      </div>
+      <div class="route-strip" id="route-strip"></div>
 
-      <div class="postcard">
+      <div id="route-card" class="postcard" style="display:none;">
         <div class="postcard-inner">
           <div class="pc-head">
             <div class="pc-from-block">
               <div class="pc-from-name">Your postcard</div>
-              <div class="pc-from-city">Sent to Seoul, South Korea</div>
-              <div class="pc-matched">about: suits & a street guitarist</div>
+              <div id="route-to-city" class="pc-from-city"></div>
+              <div class="pc-matched">matched by: your door resonance</div>
             </div>
             <div class="pc-stamps">
               <div class="pc-stamp-box">
                 <span class="stamp-emoji">🌆</span>
-                <span>LA</span>
+                <span id="route-from-city">You</span>
               </div>
-              <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
+              <div class="pc-postmark-circle">SHARED<br>ADVS<br>NOW</div>
             </div>
           </div>
           <div class="pc-body">
             <div class="pc-message-col">
-              <div class="pc-message">We put on suits for no reason and took the metro downtown. Found a guitarist outside a bar who knew every Backstreet Boys song. We stayed for two hours. The suits were the whole reason it happened.</div>
+              <div id="route-body" class="pc-message"></div>
             </div>
             <div class="pc-divider-col"></div>
             <div class="pc-address-col">
@@ -1331,16 +1081,19 @@ body::before {
                 <div class="pc-line"></div>
                 <div class="pc-line"></div>
               </div>
-              <div class="pc-to">
-                For anyone afraid to just go<br>
-                <strong>→ Seoul, Korea</strong>
-              </div>
+              <div class="pc-to" id="route-to-label"></div>
             </div>
           </div>
           <div class="pc-foot">
-            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--sage);">✓ RECEIVED · REPLY CAME BACK</span>
-            <span class="pc-when">4 DAYS AGO</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--sage);">✓ SENT</span>
+            <span class="pc-when">JUST NOW</span>
           </div>
+        </div>
+      </div>
+
+      <div id="route-empty" class="postcard" style="margin-top:12px;">
+        <div class="postcard-inner">
+          <div class="pc-message" style="padding:18px;">Send your first real postcard to populate this route.</div>
         </div>
       </div>
     </div>
@@ -1374,7 +1127,17 @@ let embedderPromise;
 let currentUser = null;
 let lastRoute = null;
 
+let bootBlocked = false;
+if (location.protocol === 'file:') {
+  bootBlocked = true;
+  alert('This static POC must be served over http://localhost (not file://) so browser modules + API calls can run. Example: python3 -m http.server 8080');
+}
+
 function requireSupabase() {
+  if (bootBlocked) {
+    alert('App boot is blocked on file://. Serve the folder locally (e.g. python3 -m http.server 8080) and open http://localhost:8080/Static-POC.html');
+    return false;
+  }
   if (!supabase) {
     alert('Supabase is not configured. Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before loading this page.');
     return false;
@@ -1421,6 +1184,8 @@ async function hydrateCurrentUser() {
   currentUser = data;
   if (currentUser) {
     document.getElementById('compose-city').value = currentUser.city || '';
+    loadInbox();
+    hydrateLastRoute();
   }
 }
 
@@ -1431,6 +1196,9 @@ window.switchView = function switchView(name) {
   document.querySelectorAll('.htab').forEach((t, i) => {
     t.classList.toggle('active', ['inbox','compose','route','onboarding'][i] === name);
   });
+
+  if (name === 'inbox' && currentUser) loadInbox();
+  if (name === 'route' && currentUser) hydrateLastRoute();
 };
 
 /* ── CARD FLIP ── */
@@ -1451,6 +1219,126 @@ function triggerHaptic(style) {
 window.hapticTap = function hapticTap() {
   triggerHaptic('tap');
 };
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+async function loadInbox() {
+  if (!requireSupabase() || !currentUser) return;
+
+  const { data, error } = await supabase
+    .from('postcards')
+    .select('id, body, image_url, city, sent_at')
+    .eq('to_id', currentUser.id)
+    .order('sent_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const list = document.getElementById('inbox-list');
+  const empty = document.getElementById('inbox-empty');
+
+  if (!data || data.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.innerHTML = data.map((p) => `
+    <div class="postcard" style="margin: 18px;">
+      <div class="postcard-inner">
+        <div class="pc-head">
+          <div class="pc-from-block">
+            <div class="pc-from-name">Unknown Sender</div>
+            <div class="pc-from-city">${escapeHtml(p.city || 'Unknown city')}</div>
+            <div class="pc-matched">routed from a resonant door</div>
+          </div>
+          <div class="pc-stamps">
+            <div class="pc-postmark-circle">SHARED<br>ADVS<br>NOW</div>
+          </div>
+        </div>
+        ${p.image_url ? `<img class="pc-front-photo" style="height:180px;border:1px solid var(--border);margin-bottom:8px;" src="${escapeHtml(p.image_url)}" alt="postcard image" />` : ''}
+        <div class="pc-message">${escapeHtml(p.body)}</div>
+        <div class="pc-foot">
+          <button class="pc-action-btn reply-btn" onclick="switchView('compose')">Reply →</button>
+          <span class="pc-when">${new Date(p.sent_at).toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRoute() {
+  const strip = document.getElementById('route-strip');
+  const card = document.getElementById('route-card');
+  const empty = document.getElementById('route-empty');
+
+  if (!lastRoute) {
+    strip.innerHTML = `
+      <div class="route-node visited"><div class="rn-city">YOU</div><div class="rn-status">READY</div></div>
+      <div class="route-node"><div class="rn-city">?</div><div class="rn-status">NOT SENT YET</div></div>
+    `;
+    card.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  strip.innerHTML = `
+    <div class="route-node visited"><div class="rn-city">${escapeHtml(lastRoute.fromCity || 'YOU')}</div><div class="rn-status">YOU · SENT</div><div class="rn-arrow">→</div></div>
+    <div class="route-node visited"><div class="rn-city">${escapeHtml(lastRoute.toCity || '?')}</div><div class="rn-status">ROUTED</div></div>
+  `;
+
+  document.getElementById('route-to-city').textContent = `Sent to ${lastRoute.toCity || 'Unknown city'}`;
+  document.getElementById('route-from-city').textContent = lastRoute.fromCity || 'You';
+  document.getElementById('route-body').textContent = lastRoute.body || '';
+  document.getElementById('route-to-label').innerHTML = `For one stranger<br><strong>→ ${escapeHtml(lastRoute.toCity || 'Unknown')}</strong>`;
+
+  card.style.display = 'block';
+  empty.style.display = 'none';
+}
+
+async function hydrateLastRoute() {
+  if (!requireSupabase() || !currentUser) return;
+
+  const { data, error } = await supabase
+    .from('postcards')
+    .select('id, body, city, sent_at, to_id')
+    .eq('from_id', currentUser.id)
+    .order('sent_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    renderRoute();
+    return;
+  }
+
+  const { data: recipient } = await supabase
+    .from('users')
+    .select('city')
+    .eq('id', data.to_id)
+    .maybeSingle();
+
+  lastRoute = {
+    postcardId: data.id,
+    toId: data.to_id,
+    toCity: recipient?.city || 'Unknown city',
+    fromCity: data.city || currentUser.city || 'You',
+    body: data.body
+  };
+
+  renderRoute();
+}
 
 /* ── SEND POSTCARD ── */
 window.sendPostcard = async function sendPostcard() {
@@ -1506,8 +1394,21 @@ window.sendPostcard = async function sendPostcard() {
     return;
   }
 
-  lastRoute = { postcardId: postcard.id, toId: recipientId, city: city || 'Unknown' };
+  const { data: recipient } = await supabase.from('users').select('city').eq('id', recipientId).maybeSingle();
+
+  lastRoute = {
+    postcardId: postcard.id,
+    toId: recipientId,
+    toCity: recipient?.city || 'Unknown city',
+    fromCity: city || currentUser.city || 'You',
+    body
+  };
+
+  document.getElementById('compose-body').value = '';
+  document.getElementById('compose-image').value = '';
+
   alert('Postcard sent. Routed to one real stranger.');
+  renderRoute();
   switchView('route');
 };
 
@@ -1550,6 +1451,8 @@ window.finishOnboarding = async function finishOnboarding() {
 
   currentUser = data;
   document.getElementById('compose-city').value = city;
+  loadInbox();
+  hydrateLastRoute();
   switchView('compose');
 };
 

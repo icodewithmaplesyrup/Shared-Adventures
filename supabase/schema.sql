@@ -26,9 +26,10 @@ create index if not exists idx_postcards_to_id on public.postcards(to_id);
 
 -- Returns one recipient id for sender:
 -- 1) nearest semantic neighbors (cosine distance)
--- 2) skip top 4 nearest neighbors, sample rank 5..100
--- 3) only users who have not received a postcard yet
--- 4) avoid same pair match in either direction
+-- 2) prefer rank 5..100 to avoid near-duplicates when enough candidates exist
+-- 3) fallback to rank 1..100 for tiny datasets (early testing)
+-- 4) only users who have not received a postcard yet
+-- 5) avoid same pair match in either direction
 create or replace function public.match_recipient_for_sender(p_from_user_id uuid)
 returns uuid
 language sql
@@ -52,10 +53,17 @@ with source as (
       select 1 from public.postcards p2
       where p2.to_id = u.id
     )
+), ranked_with_count as (
+  select r.*, count(*) over () as candidate_count
+  from ranked r
 )
 select id
-from ranked
-where rank between 5 and 100
+from ranked_with_count
+where (
+  candidate_count >= 5 and rank between 5 and 100
+) or (
+  candidate_count < 5 and rank between 1 and 100
+)
 order by random()
 limit 1;
 $$;
