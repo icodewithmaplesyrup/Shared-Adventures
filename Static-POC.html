@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shared Adventures</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Courier+Prime:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1010,244 +1011,14 @@ body::before {
 
     <!-- INBOX -->
     <div class="view active" id="view-inbox">
-
-      <!-- Postcard 1: Osaka — flippable -->
-      <div class="postcard-wrapper" id="card-1">
-        <div class="postcard-tape"></div>
-        <div class="postcard-flipper" onclick="flipCard('card-1')">
-
-          <!-- FRONT: Photo side -->
-          <div class="postcard-front">
-            <div class="pc-front-photo-wrap" style="position:relative;">
-              <img
-                class="pc-front-photo"
-                src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=800&q=80"
-                alt="Osaka covered market"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              >
-              <div class="pc-front-photo-placeholder" style="display:none;">
-                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
-                <span>Osaka, Japan · shared by sender</span>
-              </div>
-              <div class="pc-front-caption">
-                <div class="pc-front-city">Osaka, Japan</div>
-                <div class="pc-front-stamps">
-                  <div class="pc-front-stamp">
-                    <span class="stamp-emoji">🗾</span>
-                    <span>Osaka</span>
-                  </div>
-                  <div class="pc-front-postmark">SHARED<br>ADVS<br>APR 26</div>
-                </div>
-              </div>
-            </div>
-            <div class="pc-flip-hint">TAP TO READ</div>
+      <div id="inbox-empty" class="postcard" style="display:none; margin:18px;">
+        <div class="postcard-inner">
+          <div class="pc-message" style="padding:18px;">
+            No real postcards yet. Once another user sends to your door, it will appear here.
           </div>
-
-          <!-- BACK: Message side -->
-          <div class="postcard-back">
-            <div class="pc-head">
-              <div class="pc-from-block">
-                <div class="pc-from-name">Unknown Sender</div>
-                <div class="pc-from-city">Osaka, Japan</div>
-                <div class="pc-matched">matched by: going somewhere alone</div>
-              </div>
-              <div class="pc-stamps">
-                <div class="pc-stamp-box">
-                  <span class="stamp-emoji">🗾</span>
-                  <span>Osaka</span>
-                </div>
-                <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
-              </div>
-            </div>
-
-            <div class="pc-body">
-              <div class="pc-message-col">
-                <div class="pc-message">I took the wrong exit from the subway and ended up in a covered market that had been there since 1952. An old woman was selling just one thing — tamagoyaki. I sat on a plastic stool for an hour and didn't feel alone at all.</div>
-              </div>
-              <div class="pc-divider-col"></div>
-              <div class="pc-address-col">
-                <div class="pc-lines">
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                </div>
-                <div class="pc-to">
-                  For someone who goes outside alone<br>
-                  <strong>→ you</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pc-foot">
-              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
-              <span class="pc-when">2 DAYS AGO</span>
-            </div>
-            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-1')">Flip to photo</div>
-          </div>
-
         </div>
       </div>
-
-      <!-- Postcard 2: Porto — flippable -->
-      <div class="postcard-wrapper" id="card-2">
-        <div class="postcard-tape alt"></div>
-        <div class="postcard-flipper" onclick="flipCard('card-2')">
-
-          <!-- FRONT -->
-          <div class="postcard-front">
-            <div class="pc-front-photo-wrap" style="position:relative;">
-              <img
-                class="pc-front-photo"
-                src="https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80"
-                alt="Porto Portugal street"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              >
-              <div class="pc-front-photo-placeholder" style="display:none;">
-                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
-                <span>Porto, Portugal · shared by sender</span>
-              </div>
-              <div class="pc-front-caption">
-                <div class="pc-front-city">Porto, Portugal</div>
-                <div class="pc-front-stamps">
-                  <div class="pc-front-stamp">
-                    <span class="stamp-emoji">🇵🇹</span>
-                    <span>Porto</span>
-                  </div>
-                  <div class="pc-front-postmark">SHARED<br>ADVS<br>MAR 26</div>
-                </div>
-              </div>
-            </div>
-            <div class="pc-flip-hint">TAP TO READ</div>
-          </div>
-
-          <!-- BACK -->
-          <div class="postcard-back">
-            <div class="pc-head">
-              <div class="pc-from-block">
-                <div class="pc-from-name">Unknown Sender</div>
-                <div class="pc-from-city">Porto, Portugal</div>
-                <div class="pc-matched">matched by: first time going somewhere unfamiliar</div>
-              </div>
-              <div class="pc-stamps">
-                <div class="pc-stamp-box">
-                  <span class="stamp-emoji">🇵🇹</span>
-                  <span>Porto</span>
-                </div>
-                <div class="pc-postmark-circle">SHARED<br>ADVS<br>MAR 26</div>
-              </div>
-            </div>
-
-            <div class="pc-body">
-              <div class="pc-message-col">
-                <div class="pc-message">My first time doing something like this. I went to the neighborhood my grandfather grew up in — I'd driven past it my whole life. There's a café that's been there since before he was born. I understood something about him for the first time.</div>
-              </div>
-              <div class="pc-divider-col"></div>
-              <div class="pc-address-col">
-                <div class="pc-lines">
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                </div>
-                <div class="pc-to">
-                  For a first-timer<br>
-                  <strong>→ you</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pc-foot">
-              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
-              <span class="pc-when">LAST WEEK</span>
-            </div>
-            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-2')">Flip to photo</div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Postcard 3: Seoul (sent back to you) — flippable -->
-      <div class="postcard-wrapper" id="card-3">
-        <div class="postcard-tape" style="background:rgba(58,96,64,0.2)"></div>
-        <div class="postcard-flipper" onclick="flipCard('card-3')">
-
-          <!-- FRONT -->
-          <div class="postcard-front">
-            <div class="pc-front-photo-wrap" style="position:relative;">
-              <img
-                class="pc-front-photo"
-                src="https://images.unsplash.com/photo-1540914124281-342587941389?w=800&q=80"
-                alt="Seoul Korea street night"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
-              >
-              <div class="pc-front-photo-placeholder" style="display:none;">
-                <span style="font-size:32px;opacity:0.3;">◈ ◈ ◈</span>
-                <span>Seoul, South Korea · from a stranger</span>
-              </div>
-              <div class="pc-front-caption">
-                <div class="pc-front-city">Seoul, South Korea</div>
-                <div class="pc-front-stamps">
-                  <div class="pc-front-stamp">
-                    <span class="stamp-emoji">🇰🇷</span>
-                    <span>Seoul</span>
-                  </div>
-                  <div class="pc-front-postmark">SHARED<br>ADVS<br>APR 26</div>
-                </div>
-              </div>
-            </div>
-            <div class="pc-flip-hint">TAP TO READ REPLY</div>
-          </div>
-
-          <!-- BACK -->
-          <div class="postcard-back">
-            <div class="pc-head">
-              <div class="pc-from-block">
-                <div class="pc-from-name">Unknown Sender</div>
-                <div class="pc-from-city">Seoul, South Korea</div>
-                <div class="pc-matched">replying to: your suits story</div>
-              </div>
-              <div class="pc-stamps">
-                <div class="pc-stamp-box">
-                  <span class="stamp-emoji">🇰🇷</span>
-                  <span>Seoul</span>
-                </div>
-                <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
-              </div>
-            </div>
-
-            <div class="pc-body">
-              <div class="pc-message-col">
-                <div class="pc-message">We did something similar last winter. Formal clothes to a street market. The vendor gave us extra dumplings because she thought it was funny. Your story made me want to do it again.</div>
-              </div>
-              <div class="pc-divider-col"></div>
-              <div class="pc-address-col">
-                <div class="pc-lines">
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                  <div class="pc-line"></div>
-                </div>
-                <div class="pc-to">
-                  In reply to your adventure<br>
-                  <strong>→ you, in LA</strong>
-                </div>
-              </div>
-            </div>
-
-            <div class="pc-foot">
-              <button class="pc-action-btn reply-btn" onclick="event.stopPropagation();switchView('compose')">Reply →</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Keep</button>
-              <button class="pc-action-btn" onclick="event.stopPropagation();hapticTap()">Pass Along</button>
-              <span class="pc-when">1 DAY AGO</span>
-            </div>
-            <div class="pc-flip-back-hint" onclick="event.stopPropagation();flipCard('card-3')">Flip to photo</div>
-          </div>
-
-        </div>
-      </div>
-
+      <div id="inbox-list"></div>
     </div>
 
     <!-- COMPOSE -->
@@ -1259,15 +1030,15 @@ body::before {
           <div class="reply-to-tag">✦ Replying to: the Osaka market story</div>
           <div class="compose-field">
             <label>Your moment</label>
-            <textarea rows="5" placeholder="tell them what happened. what you found. what it felt like."></textarea>
+            <textarea id="compose-body" rows="5" placeholder="tell them what happened. what you found. what it felt like."></textarea>
           </div>
           <div class="compose-field">
             <label>One image (optional)</label>
-            <input type="text" placeholder="paste a photo url or tap to upload →">
+            <input id="compose-image" type="text" placeholder="paste a photo url or tap to upload →">
           </div>
           <div class="compose-field">
             <label>Where you are (city only)</label>
-            <input type="text" placeholder="East Los Angeles, CA">
+            <input id="compose-city" type="text" placeholder="East Los Angeles, CA">
           </div>
           <div class="compose-note">Your name is never shared. Your city appears on the postmark. Your postcard goes to someone matched by the theme of your story — not by algorithm.</div>
           <div class="send-row">
@@ -1281,47 +1052,27 @@ body::before {
     <!-- ROUTE -->
     <div class="view" id="view-route">
       <div class="route-header">Your postcard's journey so far —</div>
-      <div class="route-strip">
-        <div class="route-node visited">
-          <div class="rn-city">LA</div>
-          <div class="rn-status">YOU · SENT</div>
-          <div class="rn-arrow">→</div>
-        </div>
-        <div class="route-node visited">
-          <div class="rn-city">Seoul</div>
-          <div class="rn-status">READ · REPLIED</div>
-          <div class="rn-arrow">→</div>
-        </div>
-        <div class="route-node">
-          <div class="rn-city">?</div>
-          <div class="rn-status">PASSED ALONG</div>
-          <div class="rn-arrow">→</div>
-        </div>
-        <div class="route-node">
-          <div class="rn-city">?</div>
-          <div class="rn-status">?</div>
-        </div>
-      </div>
+      <div class="route-strip" id="route-strip"></div>
 
-      <div class="postcard">
+      <div id="route-card" class="postcard" style="display:none;">
         <div class="postcard-inner">
           <div class="pc-head">
             <div class="pc-from-block">
               <div class="pc-from-name">Your postcard</div>
-              <div class="pc-from-city">Sent to Seoul, South Korea</div>
-              <div class="pc-matched">about: suits & a street guitarist</div>
+              <div id="route-to-city" class="pc-from-city"></div>
+              <div class="pc-matched">matched by: your door resonance</div>
             </div>
             <div class="pc-stamps">
               <div class="pc-stamp-box">
                 <span class="stamp-emoji">🌆</span>
-                <span>LA</span>
+                <span id="route-from-city">You</span>
               </div>
-              <div class="pc-postmark-circle">SHARED<br>ADVS<br>APR 26</div>
+              <div class="pc-postmark-circle">SHARED<br>ADVS<br>NOW</div>
             </div>
           </div>
           <div class="pc-body">
             <div class="pc-message-col">
-              <div class="pc-message">We put on suits for no reason and took the metro downtown. Found a guitarist outside a bar who knew every Backstreet Boys song. We stayed for two hours. The suits were the whole reason it happened.</div>
+              <div id="route-body" class="pc-message"></div>
             </div>
             <div class="pc-divider-col"></div>
             <div class="pc-address-col">
@@ -1330,16 +1081,19 @@ body::before {
                 <div class="pc-line"></div>
                 <div class="pc-line"></div>
               </div>
-              <div class="pc-to">
-                For anyone afraid to just go<br>
-                <strong>→ Seoul, Korea</strong>
-              </div>
+              <div class="pc-to" id="route-to-label"></div>
             </div>
           </div>
           <div class="pc-foot">
-            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--sage);">✓ RECEIVED · REPLY CAME BACK</span>
-            <span class="pc-when">4 DAYS AGO</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--sage);">✓ SENT</span>
+            <span class="pc-when">JUST NOW</span>
           </div>
+        </div>
+      </div>
+
+      <div id="route-empty" class="postcard" style="margin-top:12px;">
+        <div class="postcard-inner">
+          <div class="pc-message" style="padding:18px;">Send your first real postcard to populate this route.</div>
         </div>
       </div>
     </div>
@@ -1349,7 +1103,8 @@ body::before {
       <div class="onboarding-sheet">
         <div class="ob-eyebrow">Before you get any postcards</div>
         <div class="ob-q">"What's the last time something unexpected happened to you outside, and it became a story you still tell?"</div>
-        <textarea class="ob-textarea" placeholder="take your time. even something small. the metro trip that turned into something. the wrong turn that became the right one. the night that wasn't supposed to be a night."></textarea>
+        <textarea id="door-text" class="ob-textarea" placeholder="take your time. even something small. the metro trip that turned into something. the wrong turn that became the right one. the night that wasn't supposed to be a night."></textarea>
+        <input id="door-city" class="ob-textarea" style="min-height:auto;height:52px;margin-top:12px;" placeholder="your city (for your postmark only)">
         <div class="ob-note">This becomes the seed of your first postcard, and how we match you to the right strangers. Nothing is public. Only the story you choose to send will ever leave your phone.</div>
         <button class="ob-btn" onclick="finishOnboarding()">That's my door →</button>
       </div>
@@ -1358,62 +1113,355 @@ body::before {
   </div>
 </div>
 
-<script>
+<script type="module">
+import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+const SUPABASE_URL = window.SUPABASE_URL || localStorage.getItem('supabase_url') || '';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || '';
+const MODEL_NAME = 'Xenova/all-MiniLM-L6-v2';
+
+const { createClient } = window.supabase;
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+let embedderPromise;
+let currentUser = null;
+let lastRoute = null;
+
+let bootBlocked = false;
+if (location.protocol === 'file:') {
+  bootBlocked = true;
+  alert('This static POC must be served over http://localhost (not file://) so browser modules + API calls can run. Example: python3 -m http.server 8080');
+}
+
+function requireSupabase() {
+  if (bootBlocked) {
+    alert('App boot is blocked on file://. Serve the folder locally (e.g. python3 -m http.server 8080) and open http://localhost:8080/Static-POC.html');
+    return false;
+  }
+  if (!supabase) {
+    alert('Supabase is not configured. Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before loading this page.');
+    return false;
+  }
+  return true;
+}
+
+async function getEmbedder() {
+  if (!embedderPromise) {
+    embedderPromise = pipeline('feature-extraction', MODEL_NAME, { quantized: true });
+  }
+  return embedderPromise;
+}
+
+async function embedText(text) {
+  const extractor = await getEmbedder();
+  const output = await extractor(text, { pooling: 'mean', normalize: true });
+  return Array.from(output.data);
+}
+
+function vectorLiteral(values) {
+  return `[${values.join(',')}]`;
+}
+
+function getOrCreateAnonId() {
+  let anonId = localStorage.getItem('anon_id');
+  if (!anonId) {
+    anonId = `anon_${crypto.randomUUID()}`;
+    localStorage.setItem('anon_id', anonId);
+  }
+  return anonId;
+}
+
+async function hydrateCurrentUser() {
+  if (!requireSupabase()) return;
+  const anonId = localStorage.getItem('anon_id');
+  if (!anonId) return;
+
+  const { data, error } = await supabase.from('users').select('*').eq('anon_id', anonId).maybeSingle();
+  if (error) {
+    console.error(error);
+    return;
+  }
+  currentUser = data;
+  if (currentUser) {
+    document.getElementById('compose-city').value = currentUser.city || '';
+    loadInbox();
+    hydrateLastRoute();
+  }
+}
+
 /* ── VIEW SWITCHING ── */
-function switchView(name) {
+window.switchView = function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.htab').forEach((t, i) => {
     t.classList.toggle('active', ['inbox','compose','route','onboarding'][i] === name);
   });
-}
+
+  if (name === 'inbox' && currentUser) loadInbox();
+  if (name === 'route' && currentUser) hydrateLastRoute();
+};
 
 /* ── CARD FLIP ── */
-function flipCard(id) {
+window.flipCard = function flipCard(id) {
   const wrapper = document.getElementById(id);
   const isFlipping = wrapper.classList.toggle('flipped');
-
-  // Haptic feedback on flip
   triggerHaptic(isFlipping ? 'medium' : 'light');
-}
+};
 
 /* ── HAPTIC ENGINE ── */
 function triggerHaptic(style) {
-  // Vibration API (Android, some browsers)
   if ('vibrate' in navigator) {
-    const patterns = {
-      light:  [10],
-      medium: [20],
-      heavy:  [15, 10, 15],
-      tap:    [8]
-    };
+    const patterns = { light: [10], medium: [20], heavy: [15, 10, 15], tap: [8] };
     navigator.vibrate(patterns[style] || [10]);
   }
 }
 
-function hapticTap() {
+window.hapticTap = function hapticTap() {
   triggerHaptic('tap');
+};
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+async function loadInbox() {
+  if (!requireSupabase() || !currentUser) return;
+
+  const { data, error } = await supabase
+    .from('postcards')
+    .select('id, body, image_url, city, sent_at')
+    .eq('to_id', currentUser.id)
+    .order('sent_at', { ascending: false })
+    .limit(20);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const list = document.getElementById('inbox-list');
+  const empty = document.getElementById('inbox-empty');
+
+  if (!data || data.length === 0) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+
+  empty.style.display = 'none';
+  list.innerHTML = data.map((p) => `
+    <div class="postcard" style="margin: 18px;">
+      <div class="postcard-inner">
+        <div class="pc-head">
+          <div class="pc-from-block">
+            <div class="pc-from-name">Unknown Sender</div>
+            <div class="pc-from-city">${escapeHtml(p.city || 'Unknown city')}</div>
+            <div class="pc-matched">routed from a resonant door</div>
+          </div>
+          <div class="pc-stamps">
+            <div class="pc-postmark-circle">SHARED<br>ADVS<br>NOW</div>
+          </div>
+        </div>
+        ${p.image_url ? `<img class="pc-front-photo" style="height:180px;border:1px solid var(--border);margin-bottom:8px;" src="${escapeHtml(p.image_url)}" alt="postcard image" />` : ''}
+        <div class="pc-message">${escapeHtml(p.body)}</div>
+        <div class="pc-foot">
+          <button class="pc-action-btn reply-btn" onclick="switchView('compose')">Reply →</button>
+          <span class="pc-when">${new Date(p.sent_at).toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderRoute() {
+  const strip = document.getElementById('route-strip');
+  const card = document.getElementById('route-card');
+  const empty = document.getElementById('route-empty');
+
+  if (!lastRoute) {
+    strip.innerHTML = `
+      <div class="route-node visited"><div class="rn-city">YOU</div><div class="rn-status">READY</div></div>
+      <div class="route-node"><div class="rn-city">?</div><div class="rn-status">NOT SENT YET</div></div>
+    `;
+    card.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  strip.innerHTML = `
+    <div class="route-node visited"><div class="rn-city">${escapeHtml(lastRoute.fromCity || 'YOU')}</div><div class="rn-status">YOU · SENT</div><div class="rn-arrow">→</div></div>
+    <div class="route-node visited"><div class="rn-city">${escapeHtml(lastRoute.toCity || '?')}</div><div class="rn-status">ROUTED</div></div>
+  `;
+
+  document.getElementById('route-to-city').textContent = `Sent to ${lastRoute.toCity || 'Unknown city'}`;
+  document.getElementById('route-from-city').textContent = lastRoute.fromCity || 'You';
+  document.getElementById('route-body').textContent = lastRoute.body || '';
+  document.getElementById('route-to-label').innerHTML = `For one stranger<br><strong>→ ${escapeHtml(lastRoute.toCity || 'Unknown')}</strong>`;
+
+  card.style.display = 'block';
+  empty.style.display = 'none';
+}
+
+async function hydrateLastRoute() {
+  if (!requireSupabase() || !currentUser) return;
+
+  const { data, error } = await supabase
+    .from('postcards')
+    .select('id, body, city, sent_at, to_id')
+    .eq('from_id', currentUser.id)
+    .order('sent_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    renderRoute();
+    return;
+  }
+
+  const { data: recipient } = await supabase
+    .from('users')
+    .select('city')
+    .eq('id', data.to_id)
+    .maybeSingle();
+
+  lastRoute = {
+    postcardId: data.id,
+    toId: data.to_id,
+    toCity: recipient?.city || 'Unknown city',
+    fromCity: data.city || currentUser.city || 'You',
+    body: data.body
+  };
+
+  renderRoute();
 }
 
 /* ── SEND POSTCARD ── */
-function sendPostcard() {
+window.sendPostcard = async function sendPostcard() {
+  if (!requireSupabase()) return;
+  if (!currentUser) {
+    alert('Set your door first.');
+    switchView('onboarding');
+    return;
+  }
+
+  const body = document.getElementById('compose-body').value.trim();
+  const imageUrl = document.getElementById('compose-image').value.trim() || null;
+  const city = document.getElementById('compose-city').value.trim() || currentUser.city || null;
+
+  if (!body) {
+    alert('Write your postcard before sending.');
+    return;
+  }
+
   triggerHaptic('heavy');
-  alert('Postcard sent.\n\nIt will arrive with one stranger, matched by the theme of your story.\n\nYou\'ll hear back eventually.');
+
+  const { data: recipientId, error: matchError } = await supabase.rpc('match_recipient_for_sender', {
+    p_from_user_id: currentUser.id
+  });
+
+  if (matchError) {
+    console.error(matchError);
+    alert('Matching failed. Check your Supabase RPC + schema setup.');
+    return;
+  }
+
+  if (!recipientId) {
+    alert('No match available yet. Add more doors first so routing has room to breathe.');
+    return;
+  }
+
+  const { data: postcard, error: insertError } = await supabase
+    .from('postcards')
+    .insert({
+      from_id: currentUser.id,
+      to_id: recipientId,
+      body,
+      image_url: imageUrl,
+      city,
+      status: 'sent'
+    })
+    .select('id, sent_at')
+    .single();
+
+  if (insertError) {
+    console.error(insertError);
+    alert('Send failed. Check postcards insert permissions/policies.');
+    return;
+  }
+
+  const { data: recipient } = await supabase.from('users').select('city').eq('id', recipientId).maybeSingle();
+
+  lastRoute = {
+    postcardId: postcard.id,
+    toId: recipientId,
+    toCity: recipient?.city || 'Unknown city',
+    fromCity: city || currentUser.city || 'You',
+    body
+  };
+
+  document.getElementById('compose-body').value = '';
+  document.getElementById('compose-image').value = '';
+
+  alert('Postcard sent. Routed to one real stranger.');
+  renderRoute();
   switchView('route');
-}
+};
 
 /* ── ONBOARDING ── */
-function finishOnboarding() {
-  const txt = document.querySelector('.ob-textarea').value;
-  if (!txt.trim()) { alert('Write something first — even one sentence.'); return; }
+window.finishOnboarding = async function finishOnboarding() {
+  if (!requireSupabase()) return;
+
+  const doorText = document.getElementById('door-text').value.trim();
+  const city = document.getElementById('door-city').value.trim();
+
+  if (!doorText) {
+    alert('Write something first — even one sentence.');
+    return;
+  }
+  if (!city) {
+    alert('Add your city for your postmark.');
+    return;
+  }
+
   triggerHaptic('medium');
+  const anonId = getOrCreateAnonId();
+
+  const embedding = await embedText(doorText);
+  const { data, error } = await supabase
+    .from('users')
+    .upsert({
+      anon_id: anonId,
+      city,
+      door_text: doorText,
+      door_vector: vectorLiteral(embedding)
+    }, { onConflict: 'anon_id' })
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert('Could not save your door. Verify DB schema + vector column.');
+    return;
+  }
+
+  currentUser = data;
+  document.getElementById('compose-city').value = city;
+  loadInbox();
+  hydrateLastRoute();
   switchView('compose');
-}
+};
 
 /* ── TOUCH HAPTICS on interactive elements ── */
 document.querySelectorAll('.pc-action-btn, .pc-thumb, .compose-btn, .htab').forEach(el => {
   el.addEventListener('touchstart', () => triggerHaptic('tap'), { passive: true });
 });
+
+hydrateCurrentUser();
 </script>
 </body>
 </html>
