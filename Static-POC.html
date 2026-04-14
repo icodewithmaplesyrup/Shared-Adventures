@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shared Adventures</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Permanent+Marker&family=Courier+Prime:ital,wght@0,400;1,400&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1259,15 +1260,15 @@ body::before {
           <div class="reply-to-tag">✦ Replying to: the Osaka market story</div>
           <div class="compose-field">
             <label>Your moment</label>
-            <textarea rows="5" placeholder="tell them what happened. what you found. what it felt like."></textarea>
+            <textarea id="compose-body" rows="5" placeholder="tell them what happened. what you found. what it felt like."></textarea>
           </div>
           <div class="compose-field">
             <label>One image (optional)</label>
-            <input type="text" placeholder="paste a photo url or tap to upload →">
+            <input id="compose-image" type="text" placeholder="paste a photo url or tap to upload →">
           </div>
           <div class="compose-field">
             <label>Where you are (city only)</label>
-            <input type="text" placeholder="East Los Angeles, CA">
+            <input id="compose-city" type="text" placeholder="East Los Angeles, CA">
           </div>
           <div class="compose-note">Your name is never shared. Your city appears on the postmark. Your postcard goes to someone matched by the theme of your story — not by algorithm.</div>
           <div class="send-row">
@@ -1349,7 +1350,8 @@ body::before {
       <div class="onboarding-sheet">
         <div class="ob-eyebrow">Before you get any postcards</div>
         <div class="ob-q">"What's the last time something unexpected happened to you outside, and it became a story you still tell?"</div>
-        <textarea class="ob-textarea" placeholder="take your time. even something small. the metro trip that turned into something. the wrong turn that became the right one. the night that wasn't supposed to be a night."></textarea>
+        <textarea id="door-text" class="ob-textarea" placeholder="take your time. even something small. the metro trip that turned into something. the wrong turn that became the right one. the night that wasn't supposed to be a night."></textarea>
+        <input id="door-city" class="ob-textarea" style="min-height:auto;height:52px;margin-top:12px;" placeholder="your city (for your postmark only)">
         <div class="ob-note">This becomes the seed of your first postcard, and how we match you to the right strangers. Nothing is public. Only the story you choose to send will ever leave your phone.</div>
         <button class="ob-btn" onclick="finishOnboarding()">That's my door →</button>
       </div>
@@ -1358,62 +1360,205 @@ body::before {
   </div>
 </div>
 
-<script>
+<script type="module">
+import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
+
+const SUPABASE_URL = window.SUPABASE_URL || localStorage.getItem('supabase_url') || '';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || '';
+const MODEL_NAME = 'Xenova/all-MiniLM-L6-v2';
+
+const { createClient } = window.supabase;
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+let embedderPromise;
+let currentUser = null;
+let lastRoute = null;
+
+function requireSupabase() {
+  if (!supabase) {
+    alert('Supabase is not configured. Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before loading this page.');
+    return false;
+  }
+  return true;
+}
+
+async function getEmbedder() {
+  if (!embedderPromise) {
+    embedderPromise = pipeline('feature-extraction', MODEL_NAME, { quantized: true });
+  }
+  return embedderPromise;
+}
+
+async function embedText(text) {
+  const extractor = await getEmbedder();
+  const output = await extractor(text, { pooling: 'mean', normalize: true });
+  return Array.from(output.data);
+}
+
+function vectorLiteral(values) {
+  return `[${values.join(',')}]`;
+}
+
+function getOrCreateAnonId() {
+  let anonId = localStorage.getItem('anon_id');
+  if (!anonId) {
+    anonId = `anon_${crypto.randomUUID()}`;
+    localStorage.setItem('anon_id', anonId);
+  }
+  return anonId;
+}
+
+async function hydrateCurrentUser() {
+  if (!requireSupabase()) return;
+  const anonId = localStorage.getItem('anon_id');
+  if (!anonId) return;
+
+  const { data, error } = await supabase.from('users').select('*').eq('anon_id', anonId).maybeSingle();
+  if (error) {
+    console.error(error);
+    return;
+  }
+  currentUser = data;
+  if (currentUser) {
+    document.getElementById('compose-city').value = currentUser.city || '';
+  }
+}
+
 /* ── VIEW SWITCHING ── */
-function switchView(name) {
+window.switchView = function switchView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.htab').forEach((t, i) => {
     t.classList.toggle('active', ['inbox','compose','route','onboarding'][i] === name);
   });
-}
+};
 
 /* ── CARD FLIP ── */
-function flipCard(id) {
+window.flipCard = function flipCard(id) {
   const wrapper = document.getElementById(id);
   const isFlipping = wrapper.classList.toggle('flipped');
-
-  // Haptic feedback on flip
   triggerHaptic(isFlipping ? 'medium' : 'light');
-}
+};
 
 /* ── HAPTIC ENGINE ── */
 function triggerHaptic(style) {
-  // Vibration API (Android, some browsers)
   if ('vibrate' in navigator) {
-    const patterns = {
-      light:  [10],
-      medium: [20],
-      heavy:  [15, 10, 15],
-      tap:    [8]
-    };
+    const patterns = { light: [10], medium: [20], heavy: [15, 10, 15], tap: [8] };
     navigator.vibrate(patterns[style] || [10]);
   }
 }
 
-function hapticTap() {
+window.hapticTap = function hapticTap() {
   triggerHaptic('tap');
-}
+};
 
 /* ── SEND POSTCARD ── */
-function sendPostcard() {
+window.sendPostcard = async function sendPostcard() {
+  if (!requireSupabase()) return;
+  if (!currentUser) {
+    alert('Set your door first.');
+    switchView('onboarding');
+    return;
+  }
+
+  const body = document.getElementById('compose-body').value.trim();
+  const imageUrl = document.getElementById('compose-image').value.trim() || null;
+  const city = document.getElementById('compose-city').value.trim() || currentUser.city || null;
+
+  if (!body) {
+    alert('Write your postcard before sending.');
+    return;
+  }
+
   triggerHaptic('heavy');
-  alert('Postcard sent.\n\nIt will arrive with one stranger, matched by the theme of your story.\n\nYou\'ll hear back eventually.');
+
+  const { data: recipientId, error: matchError } = await supabase.rpc('match_recipient_for_sender', {
+    p_from_user_id: currentUser.id
+  });
+
+  if (matchError) {
+    console.error(matchError);
+    alert('Matching failed. Check your Supabase RPC + schema setup.');
+    return;
+  }
+
+  if (!recipientId) {
+    alert('No match available yet. Add more doors first so routing has room to breathe.');
+    return;
+  }
+
+  const { data: postcard, error: insertError } = await supabase
+    .from('postcards')
+    .insert({
+      from_id: currentUser.id,
+      to_id: recipientId,
+      body,
+      image_url: imageUrl,
+      city,
+      status: 'sent'
+    })
+    .select('id, sent_at')
+    .single();
+
+  if (insertError) {
+    console.error(insertError);
+    alert('Send failed. Check postcards insert permissions/policies.');
+    return;
+  }
+
+  lastRoute = { postcardId: postcard.id, toId: recipientId, city: city || 'Unknown' };
+  alert('Postcard sent. Routed to one real stranger.');
   switchView('route');
-}
+};
 
 /* ── ONBOARDING ── */
-function finishOnboarding() {
-  const txt = document.querySelector('.ob-textarea').value;
-  if (!txt.trim()) { alert('Write something first — even one sentence.'); return; }
+window.finishOnboarding = async function finishOnboarding() {
+  if (!requireSupabase()) return;
+
+  const doorText = document.getElementById('door-text').value.trim();
+  const city = document.getElementById('door-city').value.trim();
+
+  if (!doorText) {
+    alert('Write something first — even one sentence.');
+    return;
+  }
+  if (!city) {
+    alert('Add your city for your postmark.');
+    return;
+  }
+
   triggerHaptic('medium');
+  const anonId = getOrCreateAnonId();
+
+  const embedding = await embedText(doorText);
+  const { data, error } = await supabase
+    .from('users')
+    .upsert({
+      anon_id: anonId,
+      city,
+      door_text: doorText,
+      door_vector: vectorLiteral(embedding)
+    }, { onConflict: 'anon_id' })
+    .select('*')
+    .single();
+
+  if (error) {
+    console.error(error);
+    alert('Could not save your door. Verify DB schema + vector column.');
+    return;
+  }
+
+  currentUser = data;
+  document.getElementById('compose-city').value = city;
   switchView('compose');
-}
+};
 
 /* ── TOUCH HAPTICS on interactive elements ── */
 document.querySelectorAll('.pc-action-btn, .pc-thumb, .compose-btn, .htab').forEach(el => {
   el.addEventListener('touchstart', () => triggerHaptic('tap'), { passive: true });
 });
+
+hydrateCurrentUser();
 </script>
 </body>
 </html>
