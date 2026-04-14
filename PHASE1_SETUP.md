@@ -114,5 +114,6 @@ In **Table Editor**:
 - Cosine distance via pgvector (`<=>`).
 - Excludes sender.
 - Avoids repeat pairings in either direction.
-- Avoids users who already received a postcard.
+- Prefers users who have never received a postcard yet.
+- Falls back to any eligible user if all candidates have already received.
 - Prefers semantic ranks **5..100** (and falls back to **1..100** when candidate count is <5).

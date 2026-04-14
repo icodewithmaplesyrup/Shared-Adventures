@@ -28,8 +28,9 @@ create index if not exists idx_postcards_to_id on public.postcards(to_id);
 -- 1) nearest semantic neighbors (cosine distance)
 -- 2) prefer rank 5..100 to avoid near-duplicates when enough candidates exist
 -- 3) fallback to rank 1..100 for tiny datasets (early testing)
--- 4) only users who have not received a postcard yet
--- 5) avoid same pair match in either direction
+-- 4) prefer users who have not received a postcard yet
+-- 5) if everyone has already received, fallback to any eligible user
+-- 6) avoid same pair match in either direction
 create or replace function public.match_recipient_for_sender(p_from_user_id uuid)
 returns uuid
 language sql
@@ -37,10 +38,14 @@ stable
 as $$
 with source as (
   select id, door_vector from public.users where id = p_from_user_id
-), ranked as (
+), base_candidates as (
   select
     u.id,
-    row_number() over (order by u.door_vector <=> s.door_vector asc) as rank
+    u.door_vector,
+    not exists (
+      select 1 from public.postcards p2
+      where p2.to_id = u.id
+    ) as has_never_received
   from public.users u
   cross join source s
   where u.id <> s.id
@@ -49,10 +54,21 @@ with source as (
       where (p.from_id = s.id and p.to_id = u.id)
          or (p.from_id = u.id and p.to_id = s.id)
     )
-    and not exists (
-      select 1 from public.postcards p2
-      where p2.to_id = u.id
-    )
+), selection_mode as (
+  select coalesce(bool_or(has_never_received), false) as prefer_never_received
+  from base_candidates
+), eligible as (
+  select b.*
+  from base_candidates b
+  cross join selection_mode m
+  where (m.prefer_never_received and b.has_never_received)
+     or (not m.prefer_never_received)
+), ranked as (
+  select
+    e.id,
+    row_number() over (order by e.door_vector <=> s.door_vector asc) as rank
+  from eligible e
+  cross join source s
 ), ranked_with_count as (
   select r.*, count(*) over () as candidate_count
   from ranked r

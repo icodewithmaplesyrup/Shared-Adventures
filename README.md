@@ -49,7 +49,8 @@ location.reload();
 The `match_recipient_for_sender(uuid)` SQL function:
 - excludes the sender,
 - avoids repeat pairings in either direction,
-- avoids recipients who already received a postcard,
+- prefers recipients who have not received a postcard yet,
+- falls back to any eligible recipient once everyone has received,
 - ranks users by cosine distance on `door_vector`,
 - prefers semantic ranks **5..100** when enough candidates exist,
 - falls back to ranks **1..100** for tiny datasets.
