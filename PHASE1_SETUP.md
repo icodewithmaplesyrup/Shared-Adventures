@@ -4,7 +4,7 @@ This phase wires the existing POC UI to a real Supabase backend so one real post
 
 ## 1) Create Supabase project
 1. Create a Supabase project.
-2. Run `supabase/schema.sql` in the SQL editor.
+2. Open `supabase/schema.sql`, copy its full SQL contents, and paste that SQL directly into the Supabase SQL Editor, then click **Run**.
 3. Copy your project URL and anon key.
 
 ## 2) Configure the PWA page
