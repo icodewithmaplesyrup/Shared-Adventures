@@ -37,8 +37,6 @@ cd Shared-Adventures
    - `users` and `postcards` tables exist.
    - `match_recipient_for_sender(uuid)` exists.
 
-If you already created the function in an earlier revision, re-run the latest `supabase/schema.sql` so `match_recipient_for_sender` is replaced with current logic.
-
 ---
 
 ## 3) Get your Supabase credentials
@@ -64,11 +62,15 @@ Then open:
 - `http://localhost:8080/Static-POC.html`
 
 ## 5) Configure the POC page with credentials
-`Static-POC.html` currently has Supabase URL + anon key hardcoded for immediate testing.
+Open `http://localhost:8080/Static-POC.html` and run this in DevTools Console:
 
-If you want to point at a different Supabase project, edit these two constants in `Static-POC.html`:
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
+```js
+localStorage.setItem('supabase_url', 'https://YOUR_PROJECT.supabase.co');
+localStorage.setItem('supabase_anon_key', 'YOUR_PUBLIC_ANON_KEY');
+location.reload();
+```
+
+> Alternative: set `window.SUPABASE_URL` and `window.SUPABASE_ANON_KEY` before the app script runs.
 
 ---
 
@@ -112,5 +114,6 @@ In **Table Editor**:
 - Cosine distance via pgvector (`<=>`).
 - Excludes sender.
 - Avoids repeat pairings in either direction.
-- Prefers unmatched users first, then safely falls back so routing does not stall in tiny test pools.
-- Prefers semantic ranks **5..100**, then falls back to **1..100** when needed.
+- Prefers users who have never received a postcard yet.
+- Falls back to any eligible user if all candidates have already received.
+- Prefers semantic ranks **5..100** (and falls back to **1..100** when candidate count is <5).
