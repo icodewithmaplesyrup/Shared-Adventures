@@ -1116,8 +1116,8 @@ body::before {
 <script type="module">
 import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-const SUPABASE_URL = 'https://xgieezqjgicsaoxgpwjx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnaWVlenFqZ2ljc2FveGdwd2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTkzNjMsImV4cCI6MjA5MTY5NTM2M30.H8zLpsbARcuMMmfAlPbDaPZtM6nJp_z-219lYST5H0w';
+const SUPABASE_URL = window.SUPABASE_URL || localStorage.getItem('supabase_url') || '';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || '';
 const MODEL_NAME = 'Xenova/all-MiniLM-L6-v2';
 
 const { createClient } = window.supabase;
@@ -1139,7 +1139,7 @@ function requireSupabase() {
     return false;
   }
   if (!supabase) {
-    alert('Supabase client failed to initialize. Verify the hardcoded URL/key are valid for this project.');
+    alert('Supabase is not configured. Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before loading this page.');
     return false;
   }
   return true;
@@ -1371,7 +1371,7 @@ window.sendPostcard = async function sendPostcard() {
   }
 
   if (!recipientId) {
-    alert('No recipient could be selected right now. This usually means everyone is already paired with you. Add more doors or clear old postcard rows while testing.');
+    alert('No match available yet. Add more doors first so routing has room to breathe.');
     return;
   }
 
