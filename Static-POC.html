@@ -1133,12 +1133,16 @@ body::before {
 <script type="module">
 import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-const SUPABASE_URL = window.SUPABASE_URL || localStorage.getItem('supabase_url') || '';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || '';
+const SUPABASE_URL = window.SUPABASE_URL || localStorage.getItem('supabase_url') || 'https://xgieezqjgicsaoxgpwjx.supabase.co';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnaWVlenFqZ2ljc2FveGdwd2p4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMTkzNjMsImV4cCI6MjA5MTY5NTM2M30.H8zLpsbARcuMMmfAlPbDaPZtM6nJp_z-219lYST5H0w';
 const MODEL_NAME = 'Xenova/all-MiniLM-L6-v2';
 
-const { createClient } = window.supabase;
-const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+function getSupabaseClient() {
+  if (!window.supabase) return null;
+  const { createClient } = window.supabase;
+  return SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+}
+let supabase = null;
 
 let embedderPromise;
 let currentUser = null;
@@ -1159,6 +1163,7 @@ function requireSupabase() {
     alert('App boot is blocked on file://. Serve the folder locally (e.g. python3 -m http.server 8080) and open http://localhost:8080/Static-POC.html');
     return false;
   }
+  if (!supabase) supabase = getSupabaseClient();
   if (!supabase) {
     alert('Supabase is not configured. Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY before loading this page.');
     return false;
