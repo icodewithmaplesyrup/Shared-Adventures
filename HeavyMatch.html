@@ -3,83 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sidequest // Vector Lab</title>
+    <title>Shared Adventures // Phase 2 RPC Lab</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --ink: #1a1208; --paper: #f5edd8; --accent: #aa3018; }
-        body { background: var(--paper); color: var(--ink); font-family: 'Courier New', Courier, monospace; padding: 2rem; max-width: 800px; margin: auto; }
-        .box { border: 2px solid var(--ink); padding: 1.5rem; margin-bottom: 2rem; background: rgba(255,255,255,0.3); }
-        textarea { width: 100%; height: 80px; background: transparent; border: 1px solid #ccc; padding: 10px; font-family: inherit; }
-        button { background: var(--ink); color: var(--paper); border: none; padding: 10px 20px; cursor: pointer; margin-top: 10px; }
-        button:disabled { opacity: 0.5; }
-        .result { font-size: 0.9rem; word-break: break-all; margin-top: 10px; color: var(--accent); }
-        h2 { border-bottom: 2px solid var(--ink); padding-bottom: 5px; }
+        body { background: var(--paper); color: var(--ink); font-family: 'Courier New', Courier, monospace; padding: 2rem; max-width: 900px; margin: auto; }
+        .box { border: 2px solid var(--ink); padding: 1rem; margin-bottom: 1rem; background: rgba(255,255,255,0.35); }
+        input, textarea { width: 100%; margin: 6px 0 8px; padding: 8px; }
+        button { background: var(--ink); color: var(--paper); border: none; padding: 8px 16px; cursor: pointer; }
+        pre { white-space: pre-wrap; word-break: break-word; color: var(--accent); }
     </style>
 </head>
 <body>
+<h1>Phase 2 RPC Lab</h1>
+<p>Uses <code>send_postcard</code>, <code>reply_postcard</code>, <code>pass_postcard</code>, <code>get_inbox</code>, and <code>get_route</code>.</p>
 
-    <h1>Sidequest Vector Lab</h1>
-    <p id="status">Status: Loading model (25MB)...</p>
+<div class="box">
+    <h3>Session</h3>
+    <input id="userId" placeholder="Current user UUID">
+    <button id="btnInbox">Load Inbox</button>
+</div>
 
-    <div class="box">
-        <h2>1. Generate Embedding</h2>
-        <textarea id="input1" placeholder="Type a Lore entry here... (e.g., 'Found a neon sign in a rainy alley')"></textarea>
-        <button id="btn1" disabled>Vectorize</button>
-        <div id="output1" class="result"></div>
-    </div>
+<div class="box">
+    <h3>Send New</h3>
+    <textarea id="newBody" rows="3" placeholder="Body"></textarea>
+    <input id="newCity" placeholder="City">
+    <button id="btnSend">send_postcard</button>
+</div>
 
-    <div class="box">
-        <h2>2. Compare Similarity</h2>
-        <textarea id="input2" placeholder="Type another entry to compare..."></textarea>
-        <button id="btnCompare" disabled>Calculate Similarity</button>
-        <div id="similarityScore" style="font-size: 2rem; font-weight: bold; margin-top: 10px;">--</div>
-        <p><i>(1.00 is identical, 0.00 is completely different)</i></p>
-    </div>
+<div class="box">
+    <h3>Reply / Pass</h3>
+    <input id="parentId" placeholder="Parent postcard id">
+    <textarea id="childBody" rows="3" placeholder="Body"></textarea>
+    <input id="childCity" placeholder="City">
+    <button id="btnReply">reply_postcard</button>
+    <button id="btnPass">pass_postcard</button>
+</div>
 
-    <script type="module">
-        // Using the CDN for Transformers.js
-        import { pipeline, dot } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.6.0';
+<div class="box">
+    <h3>Route Lookup</h3>
+    <input id="rootId" placeholder="Root postcard id">
+    <button id="btnRoute">get_route</button>
+</div>
 
-        let pipe;
-        let vector1 = null;
-        const status = document.getElementById('status');
+<div class="box">
+    <h3>Output</h3>
+    <pre id="out">Ready.</pre>
+</div>
 
-        // Initialize the pipeline
-        async function init() {
-            pipe = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
-            status.textContent = "Status: Ready. Model loaded.";
-            document.getElementById('btn1').disabled = false;
-            document.getElementById('btnCompare').disabled = false;
-        }
-        init();
+<script>
+const SUPABASE_URL = window.SUPABASE_URL || localStorage.getItem('supabase_url') || '';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || localStorage.getItem('supabase_anon_key') || '';
+const { createClient } = window.supabase;
+const out = document.getElementById('out');
 
-        // Helper: Get Vector from text
-        async function getVector(text) {
-            const output = await pipe(text, { pooling: 'mean', normalize: true });
-            return Array.from(output.data);
-        }
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    out.textContent = 'Missing Supabase credentials. Set localStorage keys first.';
+}
 
-        // Logic for Button 1
-        document.getElementById('btn1').onclick = async () => {
-            const text = document.getElementById('input1').value;
-            status.textContent = "Vectorizing...";
-            vector1 = await getVector(text);
-            document.getElementById('output1').textContent = `Vector (First 10 dims): [${vector1.slice(0, 10).join(', ')}...]`;
-            status.textContent = "Status: Ready.";
-        };
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Logic for Comparison
-        document.getElementById('btnCompare').onclick = async () => {
-            const text2 = document.getElementById('input2').value;
-            if (!vector1) { alert("Vectorize the first box first!"); return; }
-            
-            status.textContent = "Comparing...";
-            const vector2 = await getVector(text2);
-            
-            // Since we normalized the vectors, dot product = cosine similarity
-            const score = dot(vector1, vector2);
-            document.getElementById('similarityScore').textContent = score.toFixed(4);
-            status.textContent = "Status: Ready.";
-        };
-    </script>
+function show(value) {
+    out.textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
+}
+
+async function callRpc(name, payload) {
+    const { data, error } = await db.rpc(name, payload);
+    if (error) {
+        show(error);
+        return null;
+    }
+    show(data);
+    return data;
+}
+
+document.getElementById('btnInbox').onclick = async () => {
+    const userId = document.getElementById('userId').value.trim();
+    if (!userId) return show('Missing user id');
+    await callRpc('get_inbox', { p_user_id: userId });
+};
+
+document.getElementById('btnSend').onclick = async () => {
+    const userId = document.getElementById('userId').value.trim();
+    await callRpc('send_postcard', {
+        p_from_id: userId,
+        p_body: document.getElementById('newBody').value,
+        p_city: document.getElementById('newCity').value || null,
+        p_image_url: null
+    });
+};
+
+document.getElementById('btnReply').onclick = async () => {
+    const userId = document.getElementById('userId').value.trim();
+    await callRpc('reply_postcard', {
+        p_parent_postcard_id: Number(document.getElementById('parentId').value),
+        p_from_id: userId,
+        p_body: document.getElementById('childBody').value,
+        p_city: document.getElementById('childCity').value || null,
+        p_image_url: null
+    });
+};
+
+document.getElementById('btnPass').onclick = async () => {
+    const userId = document.getElementById('userId').value.trim();
+    await callRpc('pass_postcard', {
+        p_parent_postcard_id: Number(document.getElementById('parentId').value),
+        p_from_id: userId,
+        p_body: document.getElementById('childBody').value,
+        p_city: document.getElementById('childCity').value || null,
+        p_image_url: null
+    });
+};
+
+document.getElementById('btnRoute').onclick = async () => {
+    await callRpc('get_route', {
+        p_root_postcard_id: Number(document.getElementById('rootId').value)
+    });
+};
+</script>
 </body>
 </html>
