@@ -33,6 +33,60 @@ body {
   position: relative;
 }
 
+.uid-gate {
+  position: fixed;
+  inset: 0;
+  background: rgba(245,237,216,0.96);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.uid-card {
+  width: min(460px, 100%);
+  background: var(--card);
+  border: 2px solid var(--ink);
+  padding: 20px;
+  box-shadow: 8px 10px 0 rgba(0,0,0,0.12);
+}
+.uid-card h2 {
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 8px;
+}
+.uid-card p {
+  font-size: 13px;
+  color: var(--ink2);
+  margin-bottom: 10px;
+}
+.uid-card input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: transparent;
+  padding: 10px;
+  margin: 8px 0;
+}
+.uid-row {
+  display: flex;
+  gap: 8px;
+}
+.uid-btn {
+  border: none;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: var(--ink);
+  color: var(--cream);
+}
+.uid-btn.alt {
+  background: var(--rust);
+}
+.uid-result {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--rust);
+  word-break: break-word;
+}
+
 /* Paper grain overlay */
 body::before {
   content: '';
@@ -920,6 +974,20 @@ body::before {
 </head>
 <body>
 
+<div id="uid-gate" class="uid-gate">
+  <div class="uid-card">
+    <h2>Enter password</h2>
+    <p>Use your existing password (anon id) or generate a new one.</p>
+    <input id="uid-password" type="text" placeholder="38a72619-df62-4334-aaa0-46a2c36ebf72">
+    <input id="uid-new-password" type="text" placeholder="new password appears here" readonly>
+    <div class="uid-row">
+      <button class="uid-btn" onclick="enterWithPassword()">Enter</button>
+      <button class="uid-btn alt" onclick="generateNewPassword()">Get new password</button>
+    </div>
+    <div id="uid-result" class="uid-result"></div>
+  </div>
+</div>
+
 <div class="app-shell">
 
   <!-- MASTHEAD -->
@@ -930,7 +998,7 @@ body::before {
         <span class="brand-sub">A Postcard Exchange for People Who Go Outside</span>
       </div>
       <div class="masthead-nav">
-        <button class="htab active" onclick="switchView('inbox')">INBOX</button>
+        <button class="htab active" onclick="switchView('inbox')">INBOX <span id="new-mail-badge" style="display:none;">•</span></button>
         <button class="htab" onclick="switchView('compose')">WRITE</button>
         <button class="htab" onclick="switchView('route')">YOUR ROUTE</button>
         <button class="htab" onclick="switchView('onboarding')">YOUR DOOR</button>
@@ -943,64 +1011,13 @@ body::before {
     <div class="sidebar-section">
       <div class="sidebar-head">RECEIVED</div>
 
-      <div class="pc-thumb" onclick="switchView('inbox')">
-        <div class="thumb-flag">
-          <div class="thumb-postmark unread">NEW</div>
-        </div>
-        <div class="thumb-info">
-          <div class="thumb-from">Osaka, Japan</div>
-          <div class="thumb-preview">"took the wrong exit from..."</div>
-          <div class="thumb-when">2 DAYS AGO</div>
-        </div>
-      </div>
-
-      <div class="pc-thumb" onclick="switchView('inbox')">
-        <div class="thumb-flag">
-          <div class="thumb-postmark">RD</div>
-        </div>
-        <div class="thumb-info">
-          <div class="thumb-from">Porto, Portugal</div>
-          <div class="thumb-preview">"my first time doing..."</div>
-          <div class="thumb-when">LAST WEEK</div>
-        </div>
-      </div>
-
-      <div class="pc-thumb" onclick="switchView('inbox')">
-        <div class="thumb-flag">
-          <div class="thumb-postmark">RD</div>
-        </div>
-        <div class="thumb-info">
-          <div class="thumb-from">Toronto, Canada</div>
-          <div class="thumb-preview">"there's a tunnel under..."</div>
-          <div class="thumb-when">2 WEEKS AGO</div>
-        </div>
-      </div>
+      <div id="sidebar-inbox-thumbs"></div>
     </div>
 
     <div class="sidebar-section">
       <div class="sidebar-head">SENT</div>
 
-      <div class="pc-thumb">
-        <div class="thumb-flag">
-          <div class="thumb-postmark" style="border-color:var(--sage);color:var(--sage);">→</div>
-        </div>
-        <div class="thumb-info">
-          <div class="thumb-from">to Seoul, Korea</div>
-          <div class="thumb-preview">the backstreet boys incident</div>
-          <div class="thumb-when">4 DAYS AGO</div>
-        </div>
-      </div>
-
-      <div class="pc-thumb">
-        <div class="thumb-flag">
-          <div class="thumb-postmark" style="border-color:var(--sage);color:var(--sage);">→</div>
-        </div>
-        <div class="thumb-info">
-          <div class="thumb-from">to Lisbon, Portugal</div>
-          <div class="thumb-preview">in-n-out, but the journey</div>
-          <div class="thumb-when">3 WEEKS AGO</div>
-        </div>
-      </div>
+      <div id="sidebar-sent-thumbs"></div>
     </div>
 
     <button class="compose-btn" onclick="switchView('compose')">Write a Postcard →</button>
@@ -1025,9 +1042,9 @@ body::before {
     <div class="view" id="view-compose">
       <div class="compose-sheet">
         <div class="compose-inner">
-          <div class="compose-heading">Write a postcard</div>
+          <div class="compose-heading" id="compose-heading">Write a postcard</div>
           <div class="compose-sub">One moment. One image if you have one. A few lines or just one — it doesn't matter. It goes to someone who needs it.</div>
-          <div class="reply-to-tag">✦ Replying to: the Osaka market story</div>
+          <div id="compose-mode-tag" class="reply-to-tag" style="display:none;"></div>
           <div class="compose-field">
             <label>Your moment</label>
             <textarea id="compose-body" rows="5" placeholder="tell them what happened. what you found. what it felt like."></textarea>
@@ -1126,6 +1143,10 @@ const supabase = SUPABASE_URL && SUPABASE_ANON_KEY ? createClient(SUPABASE_URL, 
 let embedderPromise;
 let currentUser = null;
 let lastRoute = null;
+let inboxCache = [];
+let composeState = { mode: 'new', parentPostcard: null };
+let inboxPollInterval = null;
+let activeAnonId = null;
 
 let bootBlocked = false;
 if (location.protocol === 'file:') {
@@ -1162,18 +1183,39 @@ function vectorLiteral(values) {
   return `[${values.join(',')}]`;
 }
 
-function getOrCreateAnonId() {
-  let anonId = localStorage.getItem('anon_id');
-  if (!anonId) {
-    anonId = `anon_${crypto.randomUUID()}`;
-    localStorage.setItem('anon_id', anonId);
+function isUuid(v) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v || '');
+}
+
+function getActiveAnonId() {
+  return activeAnonId || localStorage.getItem('anon_id');
+}
+
+window.enterWithPassword = async function enterWithPassword() {
+  const candidate = document.getElementById('uid-password').value.trim();
+  if (!isUuid(candidate)) {
+    alert('Password must be a UUID like 38a72619-df62-4334-aaa0-46a2c36ebf72');
+    return;
   }
-  return anonId;
+  activeAnonId = candidate;
+  localStorage.setItem('anon_id', candidate);
+  document.getElementById('uid-gate').style.display = 'none';
+  await hydrateCurrentUser();
+  switchView(currentUser ? 'inbox' : 'onboarding');
+};
+
+window.generateNewPassword = function generateNewPassword() {
+  const nextId = crypto.randomUUID();
+  activeAnonId = nextId;
+  localStorage.setItem('anon_id', nextId);
+  document.getElementById('uid-password').value = nextId;
+  document.getElementById('uid-new-password').value = nextId;
+  document.getElementById('uid-result').textContent = `New password created: ${nextId}. Save this to access this account later.`;
 }
 
 async function hydrateCurrentUser() {
   if (!requireSupabase()) return;
-  const anonId = localStorage.getItem('anon_id');
+  const anonId = getActiveAnonId();
   if (!anonId) return;
 
   const { data, error } = await supabase.from('users').select('*').eq('anon_id', anonId).maybeSingle();
@@ -1184,8 +1226,9 @@ async function hydrateCurrentUser() {
   currentUser = data;
   if (currentUser) {
     document.getElementById('compose-city').value = currentUser.city || '';
-    loadInbox();
+    loadInbox({ showNewBadge: false });
     hydrateLastRoute();
+    startInboxPolling();
   }
 }
 
@@ -1197,7 +1240,10 @@ window.switchView = function switchView(name) {
     t.classList.toggle('active', ['inbox','compose','route','onboarding'][i] === name);
   });
 
-  if (name === 'inbox' && currentUser) loadInbox();
+  if (name === 'inbox') {
+    document.getElementById('new-mail-badge').style.display = 'none';
+    if (currentUser) loadInbox({ showNewBadge: false });
+  }
   if (name === 'route' && currentUser) hydrateLastRoute();
 };
 
@@ -1229,15 +1275,66 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
-async function loadInbox() {
+function formatRelativeTime(dateString) {
+  const ms = Date.now() - new Date(dateString).getTime();
+  const mins = Math.max(1, Math.floor(ms / 60000));
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours} hr ago`;
+  return `${Math.floor(hours / 24)} day ago`;
+}
+
+function setComposeMode(mode, parentPostcard = null) {
+  composeState = { mode, parentPostcard };
+  const heading = document.getElementById('compose-heading');
+  const tag = document.getElementById('compose-mode-tag');
+  if (mode === 'reply' && parentPostcard) {
+    heading.textContent = 'Reply postcard';
+    tag.style.display = 'block';
+    tag.textContent = `✦ Replying to: ${parentPostcard.from_city || 'Unknown city'} · "${(parentPostcard.body || '').slice(0, 38)}${(parentPostcard.body || '').length > 38 ? '…' : ''}"`;
+  } else if (mode === 'pass' && parentPostcard) {
+    heading.textContent = 'Pass postcard along';
+    tag.style.display = 'block';
+    tag.textContent = `✦ Passing along card from ${parentPostcard.from_city || 'Unknown city'}`;
+  } else {
+    heading.textContent = 'Write a postcard';
+    tag.style.display = 'none';
+    tag.textContent = '';
+  }
+}
+
+function renderSidebarThumbs() {
+  const inboxThumbs = document.getElementById('sidebar-inbox-thumbs');
+  const sentThumbs = document.getElementById('sidebar-sent-thumbs');
+
+  inboxThumbs.innerHTML = inboxCache.slice(0, 5).map((p) => `
+    <div class="pc-thumb" onclick="switchView('inbox')">
+      <div class="thumb-flag"><div class="thumb-postmark ${p.read_at ? '' : 'unread'}">${p.read_at ? 'RD' : 'NEW'}</div></div>
+      <div class="thumb-info">
+        <div class="thumb-from">${escapeHtml(p.from_city || 'Unknown city')}</div>
+        <div class="thumb-preview">"${escapeHtml((p.body || '').slice(0, 32))}${(p.body || '').length > 32 ? '…' : ''}"</div>
+        <div class="thumb-when">${escapeHtml(formatRelativeTime(p.sent_at).toUpperCase())}</div>
+      </div>
+    </div>
+  `).join('') || '<div class="thumb-preview" style="padding:8px;">No postcards yet.</div>';
+
+  sentThumbs.innerHTML = lastRoute ? `
+    <div class="pc-thumb" onclick="switchView('route')">
+      <div class="thumb-flag"><div class="thumb-postmark" style="border-color:var(--sage);color:var(--sage);">→</div></div>
+      <div class="thumb-info">
+        <div class="thumb-from">to ${escapeHtml(lastRoute.toCity || 'Unknown city')}</div>
+        <div class="thumb-preview">${escapeHtml((lastRoute.body || '').slice(0, 32))}${(lastRoute.body || '').length > 32 ? '…' : ''}</div>
+        <div class="thumb-when">${escapeHtml(formatRelativeTime(lastRoute.sentAt).toUpperCase())}</div>
+      </div>
+    </div>
+  ` : '<div class="thumb-preview" style="padding:8px;">Nothing sent yet.</div>';
+}
+
+async function loadInbox({ showNewBadge = true } = {}) {
   if (!requireSupabase() || !currentUser) return;
 
-  const { data, error } = await supabase
-    .from('postcards')
-    .select('id, body, image_url, city, sent_at')
-    .eq('to_id', currentUser.id)
-    .order('sent_at', { ascending: false })
-    .limit(20);
+  const previousTopId = inboxCache[0]?.id ?? null;
+  const { data, error } = await supabase.rpc('get_inbox', { p_user_id: currentUser.id });
 
   if (error) {
     console.error(error);
@@ -1247,21 +1344,28 @@ async function loadInbox() {
   const list = document.getElementById('inbox-list');
   const empty = document.getElementById('inbox-empty');
 
-  if (!data || data.length === 0) {
+  inboxCache = (data || []);
+
+  if (showNewBadge && previousTopId && inboxCache[0] && inboxCache[0].id !== previousTopId) {
+    document.getElementById('new-mail-badge').style.display = 'inline';
+  }
+
+  if (!inboxCache || inboxCache.length === 0) {
     list.innerHTML = '';
     empty.style.display = 'block';
+    renderSidebarThumbs();
     return;
   }
 
   empty.style.display = 'none';
-  list.innerHTML = data.map((p) => `
+  list.innerHTML = inboxCache.map((p) => `
     <div class="postcard" style="margin: 18px;">
       <div class="postcard-inner">
         <div class="pc-head">
           <div class="pc-from-block">
-            <div class="pc-from-name">Unknown Sender</div>
-            <div class="pc-from-city">${escapeHtml(p.city || 'Unknown city')}</div>
-            <div class="pc-matched">routed from a resonant door</div>
+            <div class="pc-from-name">${escapeHtml(p.from_anon_id || 'Unknown Sender')}</div>
+            <div class="pc-from-city">${escapeHtml(p.from_city || p.city || 'Unknown city')}</div>
+            <div class="pc-matched">routed by: ${escapeHtml(p.routed_by || 'door')} · depth ${escapeHtml(p.route_depth)}</div>
           </div>
           <div class="pc-stamps">
             <div class="pc-postmark-circle">SHARED<br>ADVS<br>NOW</div>
@@ -1270,12 +1374,14 @@ async function loadInbox() {
         ${p.image_url ? `<img class="pc-front-photo" style="height:180px;border:1px solid var(--border);margin-bottom:8px;" src="${escapeHtml(p.image_url)}" alt="postcard image" />` : ''}
         <div class="pc-message">${escapeHtml(p.body)}</div>
         <div class="pc-foot">
-          <button class="pc-action-btn reply-btn" onclick="switchView('compose')">Reply →</button>
+          <button class="pc-action-btn reply-btn" onclick="openReplyCompose(${p.id})">Reply →</button>
+          <button class="pc-action-btn" onclick="openPassCompose(${p.id})">Pass Along →</button>
           <span class="pc-when">${new Date(p.sent_at).toLocaleString()}</span>
         </div>
       </div>
     </div>
   `).join('');
+  renderSidebarThumbs();
 }
 
 function renderRoute() {
@@ -1283,7 +1389,7 @@ function renderRoute() {
   const card = document.getElementById('route-card');
   const empty = document.getElementById('route-empty');
 
-  if (!lastRoute) {
+  if (!lastRoute || !lastRoute.nodes?.length) {
     strip.innerHTML = `
       <div class="route-node visited"><div class="rn-city">YOU</div><div class="rn-status">READY</div></div>
       <div class="route-node"><div class="rn-city">?</div><div class="rn-status">NOT SENT YET</div></div>
@@ -1293,15 +1399,19 @@ function renderRoute() {
     return;
   }
 
-  strip.innerHTML = `
-    <div class="route-node visited"><div class="rn-city">${escapeHtml(lastRoute.fromCity || 'YOU')}</div><div class="rn-status">YOU · SENT</div><div class="rn-arrow">→</div></div>
-    <div class="route-node visited"><div class="rn-city">${escapeHtml(lastRoute.toCity || '?')}</div><div class="rn-status">ROUTED</div></div>
-  `;
+  strip.innerHTML = lastRoute.nodes.map((n, i) => `
+    <div class="route-node visited">
+      <div class="rn-city">${escapeHtml(n.to_city || '?')}</div>
+      <div class="rn-status">${i === 0 ? 'FIRST HOP' : `HOP ${i + 1}`}</div>
+      ${i < lastRoute.nodes.length - 1 ? '<div class="rn-arrow">→</div>' : ''}
+    </div>
+  `).join('');
 
-  document.getElementById('route-to-city').textContent = `Sent to ${lastRoute.toCity || 'Unknown city'}`;
-  document.getElementById('route-from-city').textContent = lastRoute.fromCity || 'You';
-  document.getElementById('route-body').textContent = lastRoute.body || '';
-  document.getElementById('route-to-label').innerHTML = `For one stranger<br><strong>→ ${escapeHtml(lastRoute.toCity || 'Unknown')}</strong>`;
+  const latest = lastRoute.nodes[lastRoute.nodes.length - 1];
+  document.getElementById('route-to-city').textContent = `Sent to ${latest.to_city || 'Unknown city'}`;
+  document.getElementById('route-from-city').textContent = latest.from_city || 'You';
+  document.getElementById('route-body').textContent = latest.body || '';
+  document.getElementById('route-to-label').innerHTML = `Route depth ${latest.route_depth}<br><strong>→ ${escapeHtml(latest.to_city || 'Unknown')}</strong>`;
 
   card.style.display = 'block';
   empty.style.display = 'none';
@@ -1312,35 +1422,58 @@ async function hydrateLastRoute() {
 
   const { data, error } = await supabase
     .from('postcards')
-    .select('id, body, city, sent_at, to_id')
+    .select('id, body, city, sent_at, to_id, root_postcard_id')
     .eq('from_id', currentUser.id)
     .order('sent_at', { ascending: false })
     .limit(1)
     .maybeSingle();
 
   if (error || !data) {
+    lastRoute = null;
     renderRoute();
+    renderSidebarThumbs();
     return;
   }
 
-  const { data: recipient } = await supabase
-    .from('users')
-    .select('city')
-    .eq('id', data.to_id)
-    .maybeSingle();
+  const { data: routeRows, error: routeError } = await supabase.rpc('get_route', {
+    p_root_postcard_id: data.root_postcard_id || data.id
+  });
+
+  if (routeError || !routeRows?.length) {
+    console.error(routeError);
+    lastRoute = null;
+    renderRoute();
+    renderSidebarThumbs();
+    return;
+  }
 
   lastRoute = {
-    postcardId: data.id,
-    toId: data.to_id,
-    toCity: recipient?.city || 'Unknown city',
-    fromCity: data.city || currentUser.city || 'You',
-    body: data.body
+    rootPostcardId: routeRows[0].root_postcard_id,
+    nodes: routeRows,
+    toCity: routeRows[routeRows.length - 1].to_city,
+    body: routeRows[routeRows.length - 1].body,
+    sentAt: routeRows[routeRows.length - 1].sent_at
   };
 
   renderRoute();
+  renderSidebarThumbs();
 }
 
 /* ── SEND POSTCARD ── */
+window.openReplyCompose = function openReplyCompose(postcardId) {
+  const target = inboxCache.find((p) => String(p.id) === String(postcardId));
+  if (!target) return;
+  setComposeMode('reply', target);
+  switchView('compose');
+};
+
+window.openPassCompose = function openPassCompose(postcardId) {
+  const target = inboxCache.find((p) => String(p.id) === String(postcardId));
+  if (!target) return;
+  setComposeMode('pass', target);
+  switchView('compose');
+};
+
 window.sendPostcard = async function sendPostcard() {
   if (!requireSupabase()) return;
   if (!currentUser) {
@@ -1360,57 +1493,57 @@ window.sendPostcard = async function sendPostcard() {
 
   triggerHaptic('heavy');
 
-  const { data: recipientId, error: matchError } = await supabase.rpc('match_recipient_for_sender', {
-    p_from_user_id: currentUser.id
-  });
-
-  if (matchError) {
-    console.error(matchError);
-    alert('Matching failed. Check your Supabase RPC + schema setup.');
-    return;
-  }
-
-  if (!recipientId) {
-    alert('No match available yet. Add more doors first so routing has room to breathe.');
-    return;
-  }
-
-  const { data: postcard, error: insertError } = await supabase
-    .from('postcards')
-    .insert({
-      from_id: currentUser.id,
-      to_id: recipientId,
-      body,
-      image_url: imageUrl,
-      city,
-      status: 'sent'
-    })
-    .select('id, sent_at')
-    .single();
-
-  if (insertError) {
-    console.error(insertError);
-    alert('Send failed. Check postcards insert permissions/policies.');
-    return;
-  }
-
-  const { data: recipient } = await supabase.from('users').select('city').eq('id', recipientId).maybeSingle();
-
-  lastRoute = {
-    postcardId: postcard.id,
-    toId: recipientId,
-    toCity: recipient?.city || 'Unknown city',
-    fromCity: city || currentUser.city || 'You',
-    body
+  let rpcName = 'send_postcard';
+  let payload = {
+    p_from_id: currentUser.id,
+    p_body: body,
+    p_image_url: imageUrl,
+    p_city: city
   };
+  if (composeState.mode === 'reply' && composeState.parentPostcard) {
+    rpcName = 'reply_postcard';
+    payload = {
+      p_parent_postcard_id: composeState.parentPostcard.id,
+      p_from_id: currentUser.id,
+      p_body: body,
+      p_image_url: imageUrl,
+      p_city: city
+    };
+  } else if (composeState.mode === 'pass' && composeState.parentPostcard) {
+    rpcName = 'pass_postcard';
+    payload = {
+      p_parent_postcard_id: composeState.parentPostcard.id,
+      p_from_id: currentUser.id,
+      p_body: body,
+      p_image_url: imageUrl,
+      p_city: city
+    };
+  }
+
+  const { error: sendError } = await supabase.rpc(rpcName, payload);
+
+  if (sendError) {
+    console.error(sendError);
+    alert('Send failed. Check Phase 2 RPC functions in schema.sql.');
+    return;
+  }
 
   document.getElementById('compose-body').value = '';
   document.getElementById('compose-image').value = '';
+  setComposeMode('new', null);
 
-  alert('Postcard sent. Routed to one real stranger.');
-  renderRoute();
+  alert('Postcard sent.');
+  await hydrateLastRoute();
+  await loadInbox({ showNewBadge: false });
   switchView('route');
 };
+
+function startInboxPolling() {
+  if (inboxPollInterval) clearInterval(inboxPollInterval);
+  inboxPollInterval = setInterval(() => {
+    if (currentUser) loadInbox({ showNewBadge: true });
+  }, 25000);
+}
 
 /* ── ONBOARDING ── */
 window.finishOnboarding = async function finishOnboarding() {
@@ -1429,7 +1562,12 @@ window.finishOnboarding = async function finishOnboarding() {
   }
 
   triggerHaptic('medium');
-  const anonId = getOrCreateAnonId();
+  const anonId = getActiveAnonId();
+  if (!anonId || !isUuid(anonId)) {
+    alert('Set your password first.');
+    document.getElementById('uid-gate').style.display = 'flex';
+    return;
+  }
 
   const embedding = await embedText(doorText);
   const { data, error } = await supabase
@@ -1453,6 +1591,7 @@ window.finishOnboarding = async function finishOnboarding() {
   document.getElementById('compose-city').value = city;
   loadInbox();
   hydrateLastRoute();
+  startInboxPolling();
   switchView('compose');
 };
 
@@ -1461,7 +1600,11 @@ document.querySelectorAll('.pc-action-btn, .pc-thumb, .compose-btn, .htab').forE
   el.addEventListener('touchstart', () => triggerHaptic('tap'), { passive: true });
 });
 
-hydrateCurrentUser();
+document.getElementById('uid-gate').style.display = 'flex';
+const rememberedAnonId = localStorage.getItem('anon_id');
+if (rememberedAnonId) {
+  document.getElementById('uid-password').value = rememberedAnonId;
+}
 </script>
 </body>
 </html>
